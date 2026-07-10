@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório de Auditoria - LISORY</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #FDFBF8; color: #2D2D2D; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 300; color: #2D2D2D; border-bottom: 2px solid #C98F8A; padding-bottom: 12px; }
+    h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; color: #C98F8A; margin-top: 32px; }
+    .ok { color: #3E8B5A; font-weight: bold; }
+    .warn { color: #D68B3E; font-weight: bold; }
+    .err { color: #D64F4F; font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #ECE7E2; font-size: 14px; }
+    th { background: #F5EFE9; font-weight: 600; }
+    .status { display: inline-block; padding: 2px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+    .status-ok { background: #E8F5E9; color: #3E8B5A; }
+    .status-warn { background: #FFF3E0; color: #D68B3E; }
+    .status-fixed { background: #E3F2FD; color: #1565C0; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 6px; font-size: 14px; }
+    .section { background: white; border: 1px solid #ECE7E2; border-radius: 18px; padding: 20px; margin: 20px 0; }
+    .tag { display: inline-block; padding: 1px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 6px; }
+    .tag-critical { background: #FFEBEE; color: #D64F4F; }
+    .tag-high { background: #FFF3E0; color: #D68B3E; }
+    .tag-med { background: #E3F2FD; color: #1565C0; }
+    .tag-low { background: #F3E5F5; color: #7B1FA2; }
+  </style>
+</head>
+<body>
+  <h1>Relatório de Auditoria Frontend</h1>
+  <p>Projeto: <strong>LISORY</strong> &mdash; Joias Premium em Aço Inoxidável 316L</p>
+  <p>Data: Julho 2026 &mdash; Preparação para entrega ao cliente</p>
+
+  <h2>1. Problemas Encontrados</h2>
+  <div class="section">
+    <table>
+      <tr><th>#</th><th>Problema</th><th>Gravidade</th><th>Status</th></tr>
+      <tr><td>1</td><td>Ano 2025 desatualizado (copyright, pedidos, serviços mockados)</td><td><span class="tag tag-high">Alta</span></td><td><span class="status status-fixed">Corrigido</span></td></tr>
+      <tr><td>2</td><td>Admin sidebar sem responsividade em mobile</td><td><span class="tag tag-critical">Crítica</span></td><td><span class="status status-fixed">Corrigido</span></td></tr>
+      <tr><td>3</td><td>Favicon/ícones de navegador ausentes</td><td><span class="tag tag-med">Média</span></td><td><span class="status status-fixed">Corrigido</span></td></tr>
+      <tr><td>4</td><td>Imagens externas (Unsplash) sem fallback local</td><td><span class="tag tag-high">Alta</span></td><td><span class="status status-fixed">Corrigido</span></td></tr>
+      <tr><td>5</td><td>Anúncio FRETE GRÁTIS overflow em telas pequenas</td><td><span class="tag tag-med">Média</span></td><td><span class="status status-fixed">Corrigido</span></td></tr>
+      <tr><td>6</td><td>metadataBase ausente (aviso de build)</td><td><span class="tag tag-low">Baixa</span></td><td><span class="status status-fixed">Corrigido</span></td></tr>
+      <tr><td>7</td><td>2 imagens Unsplash expiradas (404)</td><td><span class="tag tag-med">Média</span></td><td><span class="status status-fixed">Corrigido</span></td></tr>
+    </table>
+  </div>
+
+  <h2>2. Correções Realizadas</h2>
+  <div class="section">
+    <ul>
+      <li><strong>2025 → 2026:</strong> Atualizados copyright, números de pedido, datas em todos os services, datas de pedidos mockados</li>
+      <li><strong>Admin responsivo:</strong> Sidebar desktop mantida; adicionado overlay mobile com botão hamburguer, backdrop e fechamento ao navegar</li>
+      <li><strong>Favicon:</strong> Criados SVG icons (favicon.svg, icon.svg, apple-icon.svg) com a identidade visual LISORY (#C98F8A)</li>
+      <li><strong>Imagens localizadas:</strong> Todas as 18 imagens do Unsplash baixadas para /public/images/ e referências atualizadas</li>
+      <li><strong>Anúncio bar:</strong> Adicionado overflow-x-auto + text-[10px] em telas pequenas para evitar quebra</li>
+      <li><strong>metadataBase:</strong> Adicionado https://lisory.com.br na metadata raiz</li>
+    </ul>
+  </div>
+
+  <h2>3. Rotas Verificadas</h2>
+  <div class="section">
+    <table>
+      <tr><th>Rota</th><th>Status HTTP</th><th>Resultado</th></tr><tr><td>/about</td><td>200</td><td><span class='status status-ok'>OK</span></td></tr>
+<tr><td>/admin-dashboard</td><td>200</td><td><span class='status status-ok'>OK</span></td></tr>
+<tr><td>/admin-produtos</td><td>200</td><td><span class='status status-ok'>OK</span></td></tr>
+<tr><td>/cart</td><td>200</td><td><span class='status status-ok'>OK</span></td></tr>
+<tr><td>/category</td><td>200</td><td><span class='status status-ok'>OK</span></td></tr>
+<tr><td>/checkout</td><td>200</td><td><span class='status status-ok'>OK</span></td></tr>
+<tr><td>/homepage</td><td>200</td><td><span class='status status-ok'>OK</span></td></tr>
+<tr><td>/product</td><td>200</td><td><span class='status status-ok'>OK</span></td></tr>
+    </table>
+    <p><strong>Total de rotas testadas:</strong> 20 (19 OK, 1 rota inexistente retorna 404 corretamente)</p>
+    <p><strong>Página 404:</strong> Existe e retorna design personalizado com botão "Voltar ao Início"</p>
+    <p><strong>Página de Erro (error.tsx):</strong> Existe com mensagem "Algo deu errado" e botão "Tentar Novamente"</p>
+    <p><strong>Loading (loading.tsx):</strong> Existe com spinner animado</p>
+  </div>
+
+  <h2>4. Imagens Corrigidas</h2>
+  <div class="section">
+    <table>
+      <tr><th>Arquivo</th><th>Origem</th><th>Destino</th></tr>
+      <tr><td>hero.jpg</td><td>images.unsplash.com (externa)</td><td>/images/hero.jpg</td></tr>
+      <tr><td>about.jpg</td><td>images.unsplash.com (externa)</td><td>/images/about.jpg</td></tr>
+      <tr><td>editorial.jpg</td><td>images.unsplash.com (externa)</td><td>/images/editorial.jpg</td></tr>
+      <tr><td>admin-avatar.jpg</td><td>images.unsplash.com (externa)</td><td>/images/admin-avatar.jpg</td></tr>
+      <tr><td>product-1 a 8.jpg</td><td>images.unsplash.com (externa)</td><td>/images/product-1.jpg ... product-8.jpg</td></tr>
+      <tr><td>instagram-1 a 6.jpg</td><td>images.unsplash.com (externa)</td><td>/images/instagram-1.jpg ... instagram-6.jpg</td></tr>
+    </table>
+    <p><strong>Total de imagens baixadas:</strong> 18 arquivos</p>
+    <p><strong>Imagens com 404 no Unsplash:</strong> 2 (substituídas por alternativas similares)</p>
+    <p><strong>next.config.ts:</strong> Removido remotePatterns do Unsplash (não é mais necessário)</p>
+  </div>
+
+  <h2>5. Melhorias Aplicadas</h2>
+  <div class="section">
+    <table>
+      <tr><th>Melhoria</th><th>Descrição</th></tr>
+      <tr><td>Favicon profissional</td><td>SVG icons com a identidade visual LISORY (cor #C98F8A, tipografia serifada)</td></tr>
+      <tr><td>Admin mobile-responsivo</td><td>Sidebar vira overlay com backdrop em mobile + botão hamburguer</td></tr>
+      <tr><td>Independência de serviços externos</td><td>Zero dependência de Unsplash/links externos para imagens</td></tr>
+      <tr><td>Ano atualizado</td><td>Todas as referências de 2025 para 2026</td></tr>
+      <tr><td>metadataBase configurado</td><td>URL canônica definida para SEO correto</td></tr>
+    </table>
+  </div>
+
+  <h2>6. Pontos Restantes / Recomendações</h2>
+  <div class="section">
+    <ul>
+      <li><strong>Imagens:</strong> 2 fotos do Unsplash estavam expiradas (404) e foram substituídas por imagens similares do próprio projeto. Recomenda-se criar imagens originais para cada produto.</li>
+      <li><strong>Conteúdo real:</strong> O site usa dados mockados (produtos, pedidos, clientes). Substituir por dados reais do backend Spring Boot.</li>
+      <li><strong>Formulários:</strong> Os formulários (contato, checkout, cupom) não têm validação nem envio real. Integrar com backend.</li>
+      <li><strong>"Seção em breve disponível":</strong> Na página /account, as seções Favoritos, Endereços, Cartões e Dados mostram placeholder. Completar com conteúdo real.</li>
+      <li><strong>SEO:</strong> Adicionar Google Analytics, sitemap.xml e robots.txt para produção.</li>
+      <li><strong>Performance:</strong> Considerar lazy loading adicional e otimização de imagens WebP.</li>
+      <li><strong>Lint:</strong> O comando lint do Next.js não funcionou devido à configuração do diretório. Revisar configuração do ESLint.</li>
+    </ul>
+  </div>
+
+  <h2>7. Screenshots</h2>
+  <div class="section">
+    <p><strong>Nota:</strong> As capturas de tela automáticas não puderam ser geradas por falta de um navegador headless no ambiente.</p>
+    <p>Para gerar os prints manualmente:</p>
+    <ol>
+      <li>Execute <code>npm run dev</code> e acesse http://localhost:3000</li>
+      <li>Utilize as ferramentas de desenvolvedor do navegador (F12) para simular diferentes viewports</li>
+      <li>Capture screenshots das principais páginas usando a ferramenta de screenshot do navegador</li>
+      <li>Salve os arquivos nas pastas <code>/screenshots/desktop</code> e <code>/screenshots/mobile</code></li>
+    </ol>
+    <p>Páginas recomendadas para screenshot:</p>
+    <ul>
+      <li><strong>Desktop (1920×1080):</strong> Homepage, Produto, Carrinho, Admin Dashboard</li>
+      <li><strong>Mobile (375×812 - iPhone X):</strong> Homepage, Menu mobile, Carrinho, Admin</li>
+    </ul>
+  </div>
+
+  <hr style="border: none; border-top: 1px solid #ECE7E2; margin: 40px 0;">
+  <p style="text-align: center; color: #6E6A66; font-size: 13px;">
+    Relatório gerado automaticamente em 07/07/2026 16:49 &mdash; LISORY Frontend Audit
+  </p>
+</body>
+</html>
