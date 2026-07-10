@@ -7,6 +7,9 @@
 FROM node:22-alpine AS deps
 WORKDIR /app
 
+ARG NEXT_PUBLIC_API_URL=https://lisory.com.br
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 COPY package.json package-lock.json ./
 RUN npm ci
 

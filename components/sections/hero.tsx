@@ -35,10 +35,8 @@ export function HeroSection() {
             <br />
             com você.
           </h1>
-          <p className="text-[#6E5A5D] text-base lg:text-lg leading-relaxed mb-10 max-w-md">
-            Descubra a experiência Lisory Scoop. Acessórios selecionados, mix dourado e prata, 
-            <br />
-            vídeo exclusivo e até 5 trocas.
+          <p className="text-[#6E5A5D] text-sm sm:text-base lg:text-lg leading-relaxed mb-8 sm:mb-10 max-w-md">
+            Descubra a experiência Lisory Scoop. Acessórios selecionados, mix dourado e prata, vídeo exclusivo e até 5 trocas.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link

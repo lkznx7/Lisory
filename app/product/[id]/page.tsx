@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductDetailContent } from "./content";
+import { products as fallbackProducts } from "@/constants/data";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
@@ -13,10 +14,14 @@ async function getProduct(slug: string) {
     const res = await fetch(`${API_URL}/products/${slug}`, {
       cache: "no-store",
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const fallback = fallbackProducts.find((p) => p.id === slug || p.id === decodeURIComponent(slug));
+      return fallback || null;
+    }
     return res.json();
   } catch {
-    return null;
+    const fallback = fallbackProducts.find((p) => p.id === slug || p.id === decodeURIComponent(slug));
+    return fallback || null;
   }
 }
 
@@ -56,27 +61,29 @@ export default async function ProductPage({ params }: Props) {
   const relatedApi = await getRelatedProducts(apiProduct.id);
 
   const product = {
-    id: apiProduct.slug,
+    id: apiProduct.slug || apiProduct.id,
     name: apiProduct.name,
-    price: apiProduct.promotionalPrice || apiProduct.price,
-    originalPrice: apiProduct.promotionalPrice ? apiProduct.price : undefined,
-    image: apiProduct.images?.find((img: any) => img.isPrimary)?.imageUrl || apiProduct.images?.[0]?.imageUrl || "/images/placeholder.jpg",
-    category: apiProduct.categoryName || "Scoop",
-    rating: 4.9,
-    reviews: 187,
+    price: apiProduct.price,
+    originalPrice: apiProduct.originalPrice,
+    image: apiProduct.image || apiProduct.images?.find((img: any) => img.isPrimary)?.imageUrl || "/images/placeholder.jpg",
+    category: apiProduct.category || apiProduct.categoryName || "Scoop",
+    rating: apiProduct.rating || 4.9,
+    reviews: apiProduct.reviews || 187,
     description: apiProduct.description,
   };
 
-  const relatedProducts = relatedApi.map((p: any) => ({
-    id: p.slug,
-    name: p.name,
-    price: p.promotionalPrice || p.price,
-    originalPrice: p.promotionalPrice ? p.price : undefined,
-    image: p.images?.find((img: any) => img.isPrimary)?.imageUrl || p.images?.[0]?.imageUrl || "/images/placeholder.jpg",
-    category: p.categoryName || "Scoop",
-    rating: 4.9,
-    reviews: Math.floor(Math.random() * 200) + 50,
-  }));
+  const relatedProducts = relatedApi.length > 0
+    ? relatedApi.map((p: any) => ({
+        id: p.slug || p.id,
+        name: p.name,
+        price: p.promotionalPrice || p.price,
+        originalPrice: p.promotionalPrice ? p.price : undefined,
+        image: p.images?.find((img: any) => img.isPrimary)?.imageUrl || p.images?.[0]?.imageUrl || "/images/placeholder.jpg",
+        category: p.categoryName || "Scoop",
+        rating: 4.9,
+        reviews: Math.floor(Math.random() * 200) + 50,
+      }))
+    : fallbackProducts.filter((p) => p.id !== product.id).slice(0, 4);
 
   return <ProductDetailContent product={product as any} relatedProducts={relatedProducts as any} />;
 }

@@ -61,9 +61,9 @@ export function CartPageContent() {
   const total = totalPrice + shipping;
 
   return (
-    <main className="pt-[88px] lg:pt-[96px] min-h-screen bg-[#FFF9F8]">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-12">
-        <h1 className="font-['Cormorant_Garamond'] text-4xl font-light text-[#7A4B52] mb-10">
+    <main className="pt-[72px] sm:pt-[88px] lg:pt-[96px] min-h-screen bg-[#FFF9F8]">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 sm:py-12">
+        <h1 className="font-['Cormorant_Garamond'] text-3xl sm:text-4xl font-light text-[#7A4B52] mb-6 sm:mb-10">
           Carrinho de Compras
         </h1>
         {items.length === 0 ? (
@@ -78,18 +78,18 @@ export function CartPageContent() {
             </Link>
           </div>
         ) : (
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-2 space-y-4">
               {items.map((item) => (
                 <motion.div
                   key={item.id}
                   layout
-                  className="flex gap-5 bg-white border border-[#F2DCDD] rounded-[18px] p-5"
+                  className="flex gap-3 sm:gap-5 bg-white border border-[#F2DCDD] rounded-[18px] p-3 sm:p-5"
                 >
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="w-24 h-24 object-cover rounded-[14px] bg-[#FCEEEF] flex-shrink-0"
+                    className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-[14px] bg-[#FCEEEF] flex-shrink-0"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between gap-2">

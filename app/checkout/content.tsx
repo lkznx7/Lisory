@@ -131,9 +131,9 @@ export function CheckoutPageContent() {
   const total = totalPrice + shippingCost;
 
   return (
-    <main className="pt-[88px] lg:pt-[96px] min-h-screen bg-[#FFF9F8]">
-      <div className="max-w-6xl mx-auto px-4 lg:px-6 py-10">
-        <div className="flex items-center mb-12">
+    <main className="pt-[72px] sm:pt-[88px] lg:pt-[96px] min-h-screen bg-[#FFF9F8]">
+      <div className="max-w-6xl mx-auto px-4 lg:px-6 py-6 sm:py-10">
+        <div className="flex items-center mb-6 sm:mb-12">
           {steps.map((s, i) => (
             <div key={s} className="flex items-center flex-1 last:flex-none">
               <div className="flex items-center gap-3">
@@ -167,14 +167,14 @@ export function CheckoutPageContent() {
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
           <div className="lg:col-span-2">
             {step === 1 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
-                <h2 className="font-['Cormorant_Garamond'] text-3xl font-light text-[#7A4B52] mb-6">
+                <h2 className="font-['Cormorant_Garamond'] text-2xl sm:text-3xl font-light text-[#7A4B52] mb-4 sm:mb-6">
                   Identificacao
                 </h2>
-                <p className="text-sm text-[#6E5A5D] mb-4">
+                <p className="text-sm text-[#6E5A5D] mb-3 sm:mb-4">
                   Preencha seus dados para continuar. Voce tambem pode comprar como visitante.
                 </p>
                 <div className="grid gap-4">
@@ -203,10 +203,10 @@ export function CheckoutPageContent() {
 
             {step === 2 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
-                <h2 className="font-['Cormorant_Garamond'] text-3xl font-light text-[#7A4B52] mb-6">
+                <h2 className="font-['Cormorant_Garamond'] text-2xl sm:text-3xl font-light text-[#7A4B52] mb-4 sm:mb-6">
                   Endereco de Entrega
                 </h2>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
                     { label: "CEP", field: "zipCode" as const, placeholder: "00000-000", full: false },
                     { label: "Rua", field: "street" as const, placeholder: "Nome da rua", full: true },
@@ -216,7 +216,7 @@ export function CheckoutPageContent() {
                     { label: "Cidade", field: "city" as const, placeholder: "Cidade", full: false },
                     { label: "Estado", field: "state" as const, placeholder: "SP", full: false },
                   ].map((field) => (
-                    <div key={field.label} className={field.full ? "col-span-2" : ""}>
+                    <div key={field.label} className={field.full ? "sm:col-span-2" : ""}>
                       <label className="block text-xs font-semibold text-[#7A4B52] mb-2">{field.label}</label>
                       <input
                         placeholder={field.placeholder}
@@ -232,7 +232,7 @@ export function CheckoutPageContent() {
 
             {step === 3 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
-                <h2 className="font-['Cormorant_Garamond'] text-3xl font-light text-[#7A4B52] mb-6">
+                <h2 className="font-['Cormorant_Garamond'] text-2xl sm:text-3xl font-light text-[#7A4B52] mb-4 sm:mb-6">
                   Opcoes de Entrega
                 </h2>
 
@@ -291,10 +291,10 @@ export function CheckoutPageContent() {
 
             {step === 4 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                <h2 className="font-['Cormorant_Garamond'] text-3xl font-light text-[#7A4B52] mb-6">
+                <h2 className="font-['Cormorant_Garamond'] text-2xl sm:text-3xl font-light text-[#7A4B52] mb-4 sm:mb-6">
                   Pagamento
                 </h2>
-                <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
                   {[
                     { id: "pix", label: "PIX", desc: "Aprovacao instantanea" },
                     { id: "card", label: "Cartao de Credito", desc: "Ate 12x sem juros" },

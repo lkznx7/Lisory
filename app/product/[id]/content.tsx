@@ -14,9 +14,9 @@ interface ProductDetailContentProps {
 
 export function ProductDetailContent({ product, relatedProducts }: ProductDetailContentProps) {
   return (
-    <main className="pt-[88px] lg:pt-[96px] min-h-screen bg-[#FFF9F8]">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6">
-        <div className="flex items-center gap-2 text-xs text-[#6E5A5D] mb-8">
+    <main className="pt-[72px] sm:pt-[88px] lg:pt-[96px] min-h-screen bg-[#FFF9F8]">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4 sm:py-6">
+        <div className="flex items-center gap-2 text-xs text-[#6E5A5D] mb-6 sm:mb-8 overflow-x-auto scrollbar-none">
           <Link href="/" className="hover:text-[#D97D93] transition-colors">
             Inicio
           </Link>
@@ -31,14 +31,14 @@ export function ProductDetailContent({ product, relatedProducts }: ProductDetail
           <span className="text-[#7A4B52]">{product.name}</span>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
+        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-16">
           <ProductGallery product={product} />
           <ProductInfo product={product} />
         </div>
 
         {relatedProducts.length > 0 && (
-          <div className="mt-20">
-            <h2 className="font-['Cormorant_Garamond'] text-3xl font-light text-[#7A4B52] mb-8">
+          <div className="mt-12 sm:mt-16 lg:mt-20">
+            <h2 className="font-['Cormorant_Garamond'] text-2xl sm:text-3xl font-light text-[#7A4B52] mb-6 sm:mb-8">
               Outros Produtos
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
