@@ -24,9 +24,6 @@ tsconfig.tsbuildinfo
 .DS_Store
 Thumbs.db
 
-# Backend (separate repo)
-Backend/
-
 # Misc
 *.log
 npm-debug.log*
