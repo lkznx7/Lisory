@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://sxu4qwcxxcr8lt6fr009eocq.195.35.43.126.sslip.io";
 
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
