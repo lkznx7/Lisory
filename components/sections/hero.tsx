@@ -10,14 +10,14 @@ export function HeroSection() {
     <section className="relative min-h-[92vh] flex items-center overflow-hidden pt-[88px] lg:pt-[96px]">
       <div className="absolute inset-0">
         <Image
-          src="/images/hero.jpg"
+          src="/images/hero.png"
           alt="Lisory Scoop"
           fill
           priority
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#FFF9F8]/95 via-[#FFF9F8]/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#FFF9F8]/90 via-[#FFF9F8]/50 to-transparent" />
       </div>
       <div className="relative max-w-7xl mx-auto px-4 lg:px-12 py-24">
         <motion.div
