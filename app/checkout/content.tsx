@@ -27,6 +27,36 @@ interface CheckoutData {
   paymentMethod: string;
 }
 
+function validateStep(step: number, data: CheckoutData): string | null {
+  switch (step) {
+    case 1:
+      if (!data.guestName.trim()) return "Nome e obrigatorio";
+      if (!data.guestEmail.trim()) return "E-mail e obrigatorio";
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.guestEmail)) return "E-mail invalido";
+      if (!data.guestCpf.trim()) return "CPF e obrigatorio";
+      if (!/^[\d.-]+$/.test(data.guestCpf.replace(/[^\d]/g, ""))) return "CPF invalido";
+      if (data.guestCpf.replace(/\D/g, "").length !== 11) return "CPF deve ter 11 digitos";
+      if (!data.guestPhone.trim()) return "Telefone e obrigatorio";
+      return null;
+    case 2:
+      if (!data.zipCode.trim()) return "CEP e obrigatorio";
+      if (data.zipCode.replace(/\D/g, "").length !== 8) return "CEP deve ter 8 digitos";
+      if (!data.street.trim()) return "Rua e obrigatoria";
+      if (!data.number.trim()) return "Numero e obrigatorio";
+      if (!data.neighborhood.trim()) return "Bairro e obrigatorio";
+      if (!data.city.trim()) return "Cidade e obrigatoria";
+      if (!data.state.trim()) return "Estado e obrigatorio";
+      if (data.state.length !== 2) return "Estado deve ter 2 letras";
+      return null;
+    case 3:
+      return null;
+    case 4:
+      return null;
+    default:
+      return null;
+  }
+}
+
 export function CheckoutPageContent() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -66,13 +96,15 @@ export function CheckoutPageContent() {
         height: 5,
         length: 20,
       }));
+      console.log("[CHECKOUT] Calculating freight for CEP:", zipCode, "items:", freightItems.length);
       const options = await shippingService.calculateFreight({ zipCode, items: freightItems });
+      console.log("[CHECKOUT] Freight options received:", options.length);
       setShippingOptions(options);
       if (options.length > 0) {
         setSelectedShipping(options[0]);
       }
     } catch (error) {
-      console.error("Error calculating freight:", error);
+      console.error("[CHECKOUT] Freight calculation error:", error);
       setShippingOptions([{ carrier: "PAC", service: "PAC", cost: 0, estimatedDays: 10 }]);
     } finally {
       setLoadingShipping(false);
@@ -85,9 +117,24 @@ export function CheckoutPageContent() {
     }
   }, [data.zipCode]);
 
+  const handleNext = () => {
+    const error = validateStep(step, data);
+    if (error) {
+      toast.error(error);
+      return;
+    }
+    setStep(step + 1);
+  };
+
   const handleFinish = async () => {
     if (items.length === 0) {
       toast.error("Seu carrinho esta vazio");
+      return;
+    }
+
+    const paymentError = validateStep(4, data);
+    if (paymentError) {
+      toast.error(paymentError);
       return;
     }
 
@@ -95,32 +142,38 @@ export function CheckoutPageContent() {
     try {
       const orderData = {
         paymentMethod: data.paymentMethod === "pix" ? "PIX" : data.paymentMethod === "card" ? "CARTAO" : "BOLETO",
-        guestName: data.guestName || undefined,
-        guestEmail: data.guestEmail || undefined,
-        guestPhone: data.guestPhone || undefined,
-        guestCpf: data.guestCpf || undefined,
-        street: data.street || undefined,
-        number: data.number || undefined,
+        guestName: data.guestName,
+        guestEmail: data.guestEmail,
+        guestPhone: data.guestPhone,
+        guestCpf: data.guestCpf,
+        street: data.street,
+        number: data.number,
         complement: data.complement || undefined,
-        neighborhood: data.neighborhood || undefined,
-        city: data.city || undefined,
-        state: data.state || undefined,
-        zipCode: data.zipCode || undefined,
+        neighborhood: data.neighborhood,
+        city: data.city,
+        state: data.state,
+        zipCode: data.zipCode.replace(/\D/g, ""),
         shippingCarrier: selectedShipping?.carrier || undefined,
         shippingService: selectedShipping?.service || undefined,
         shippingCost: selectedShipping?.cost || 0,
       };
 
+      console.log("[CHECKOUT] Submitting order:", { paymentMethod: orderData.paymentMethod, items: items.length });
       const result = await api.post<{ id: string; checkoutUrl?: string }>("/orders/public", orderData);
+      console.log("[CHECKOUT] Order created:", { orderId: result.id, hasCheckoutUrl: !!result.checkoutUrl });
+
       await clearCart();
       toast.success("Pedido realizado com sucesso!");
 
       if (result.checkoutUrl) {
+        console.log("[CHECKOUT] Redirecting to InfinitePay:", result.checkoutUrl.substring(0, 60) + "...");
         window.location.href = result.checkoutUrl;
       } else {
+        console.log("[CHECKOUT] No checkoutUrl, redirecting to confirmation");
         router.push(`/confirmation?orderId=${result.id}`);
       }
     } catch (err) {
+      console.error("[CHECKOUT] Order creation error:", err);
       toast.error(err instanceof Error ? err.message : "Erro ao finalizar pedido");
     } finally {
       setLoading(false);
@@ -208,7 +261,7 @@ export function CheckoutPageContent() {
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
-                    { label: "CEP", field: "zipCode" as const, placeholder: "00000-000", full: false },
+                    { label: "CEP", field: "zipCode" as const, placeholder: "00000000", full: false },
                     { label: "Rua", field: "street" as const, placeholder: "Nome da rua", full: true },
                     { label: "Numero", field: "number" as const, placeholder: "123", full: false },
                     { label: "Complemento", field: "complement" as const, placeholder: "Apto, Sala...", full: false },
@@ -339,7 +392,7 @@ export function CheckoutPageContent() {
                 </button>
               )}
               <button
-                onClick={() => (step < 4 ? setStep(step + 1) : handleFinish())}
+                onClick={() => (step < 4 ? handleNext() : handleFinish())}
                 disabled={loading}
                 className="h-12 px-8 bg-[#D97D93] hover:bg-[#C8667F] text-white text-sm font-semibold rounded-xl transition-colors flex items-center gap-2 disabled:opacity-50"
               >
