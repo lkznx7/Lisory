@@ -13,7 +13,7 @@ import com.lisory.backend.produtos.repository.CategoryRepository;
 import com.lisory.backend.produtos.repository.CollectionRepository;
 import com.lisory.backend.produtos.repository.ProductRepository;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Profile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Component
-@Profile("!prod")
+@ConditionalOnProperty(name = "data.initializer.enabled", havingValue = "true")
 public class DataInitializer implements CommandLineRunner {
 
     private final AuthRepository authRepository;
