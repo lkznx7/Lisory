@@ -111,12 +111,12 @@ export function CheckoutPageContent() {
         shippingCost: selectedShipping?.cost || 0,
       };
 
-      const result = await api.post<{ id: string; paymentLink?: string }>("/orders/public", orderData);
+      const result = await api.post<{ id: string; checkoutUrl?: string }>("/orders/public", orderData);
       await clearCart();
       toast.success("Pedido realizado com sucesso!");
 
-      if (result.paymentLink) {
-        window.location.href = result.paymentLink;
+      if (result.checkoutUrl) {
+        window.location.href = result.checkoutUrl;
       } else {
         router.push(`/confirmation?orderId=${result.id}`);
       }
