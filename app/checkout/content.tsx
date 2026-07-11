@@ -27,6 +27,14 @@ interface CheckoutData {
   paymentMethod: string;
 }
 
+interface ViaCepResponse {
+  logradouro: string;
+  bairro: string;
+  localidade: string;
+  uf: string;
+  erro?: boolean;
+}
+
 function validateStep(step: number, data: CheckoutData): string | null {
   switch (step) {
     case 1:
@@ -117,6 +125,28 @@ export function CheckoutPageContent() {
     }
   }, [data.zipCode]);
 
+  const handleCepBlur = async (value: string) => {
+    const cep = value.replace(/\D/g, "");
+    if (cep.length !== 8) return;
+    console.log("CEP digitado:", cep);
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const dataCep: ViaCepResponse = await res.json();
+      console.log("[CHECKOUT] ViaCEP response:", dataCep);
+      if (!dataCep.erro) {
+        setData((prev) => ({
+          ...prev,
+          street: dataCep.logradouro || prev.street,
+          neighborhood: dataCep.bairro || prev.neighborhood,
+          city: dataCep.localidade || prev.city,
+          state: dataCep.uf || prev.state,
+        }));
+      }
+    } catch (err) {
+      console.error("[CHECKOUT] ViaCEP error:", err);
+    }
+  };
+
   const handleNext = () => {
     const error = validateStep(step, data);
     if (error) {
@@ -140,26 +170,42 @@ export function CheckoutPageContent() {
 
     setLoading(true);
     try {
-      const orderData = {
-        paymentMethod: data.paymentMethod === "pix" ? "PIX" : data.paymentMethod === "card" ? "CARTAO" : "BOLETO",
-        guestName: data.guestName,
-        guestEmail: data.guestEmail,
-        guestPhone: data.guestPhone,
-        guestCpf: data.guestCpf,
-        street: data.street,
-        number: data.number,
-        complement: data.complement || undefined,
-        neighborhood: data.neighborhood,
-        city: data.city,
-        state: data.state,
-        zipCode: data.zipCode.replace(/\D/g, ""),
-        shippingCarrier: selectedShipping?.carrier || undefined,
-        shippingService: selectedShipping?.service || undefined,
-        shippingCost: selectedShipping?.cost || 0,
+      const orderPayload = {
+        customer: {
+          name: data.guestName,
+          email: data.guestEmail,
+          cpf: data.guestCpf.replace(/\D/g, ""),
+          phone: data.guestPhone,
+        },
+        address: {
+          street: data.street,
+          number: data.number,
+          complement: data.complement || null,
+          neighborhood: data.neighborhood,
+          city: data.city,
+          state: data.state,
+          zipCode: data.zipCode.replace(/\D/g, ""),
+        },
+        items: items.map((item) => ({
+          productId: item.id,
+          quantity: String(item.qty),
+          price: item.price,
+          description: item.name,
+        })),
+        shippingOption: {
+          carrier: selectedShipping?.carrier || null,
+          service: selectedShipping?.service || null,
+          cost: selectedShipping?.cost || 0,
+          estimatedDays: selectedShipping?.estimatedDays || null,
+        },
       };
 
-      console.log("[CHECKOUT] Submitting order:", { paymentMethod: orderData.paymentMethod, items: items.length });
-      const result = await api.post<{ id: string; checkoutUrl?: string }>("/orders/public", orderData);
+      console.log("[CHECKOUT] Submitting order:", {
+        customer: orderPayload.customer.name,
+        items: orderPayload.items.length,
+        shippingCost: orderPayload.shippingOption.cost,
+      });
+      const result = await api.post<{ id: string; checkoutUrl?: string }>("/orders/public", orderPayload);
       console.log("[CHECKOUT] Order created:", { orderId: result.id, hasCheckoutUrl: !!result.checkoutUrl });
 
       await clearCart();
@@ -275,6 +321,7 @@ export function CheckoutPageContent() {
                         placeholder={field.placeholder}
                         value={data[field.field]}
                         onChange={(e) => updateField(field.field, e.target.value)}
+                        onBlur={field.field === "zipCode" ? (e) => handleCepBlur(e.target.value) : undefined}
                         className="w-full h-12 px-4 border border-[#F2DCDD] rounded-xl text-sm text-[#7A4B52] placeholder-[#6E5A5D] outline-none focus:border-[#D97D93] transition-colors bg-white"
                       />
                     </div>
