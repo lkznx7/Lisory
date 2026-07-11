@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ProductDetailContent } from "./content";
 import { products as fallbackProducts } from "@/constants/data";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://sxu4qwcxxcr8lt6fr009eocq.195.35.43.126.sslip.io";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.lisory.com.br";
 
 interface Props {
   params: Promise<{ id: string }>;
