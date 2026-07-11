@@ -127,16 +127,19 @@ public class ProductService {
         productRepository.delete(product);
     }
 
+    @Transactional(readOnly = true)
     public ProductResponse findById(UUID id) {
         return toResponse(productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id)));
     }
 
+    @Transactional(readOnly = true)
     public ProductResponse findBySlug(String slug) {
         return toResponse(productRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "slug", slug)));
     }
 
+    @Transactional(readOnly = true)
     public Page<ProductResponse> findAll(ProductFilter filter) {
         Sort sort = Sort.by(
                 "desc".equalsIgnoreCase(filter.getDirection()) ? Sort.Direction.DESC : Sort.Direction.ASC,
@@ -172,6 +175,7 @@ public class ProductService {
         return products.map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
     public List<ProductResponse> findRelated(UUID productId, int limit) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
@@ -187,6 +191,7 @@ public class ProductService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ProductResponse> findFeatured() {
         return productRepository.findByFeaturedTrueAndActiveTrue(PageRequest.of(0, 50))
                 .stream()
@@ -194,6 +199,7 @@ public class ProductService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ProductResponse> findNewArrivals() {
         return productRepository.findTop12ByActiveTrueOrderByCreatedAtDesc()
                 .stream()

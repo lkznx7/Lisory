@@ -33,8 +33,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -139,7 +141,7 @@ public class OrderService {
         order.setGuestPhone(request.guestPhone());
         order.setGuestCpf(request.guestCpf());
 
-        List<OrderItem> orderItems = cart.getItems().stream()
+        Set<OrderItem> orderItems = cart.getItems().stream()
                 .map(cartItem -> {
                     OrderItem orderItem = new OrderItem();
                     orderItem.setOrder(order);
@@ -151,7 +153,7 @@ public class OrderService {
                     orderItem.setUnitPrice(price);
                     return orderItem;
                 })
-                .toList();
+                .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
         order.setItems(orderItems);
 
         Order savedOrder = orderRepository.save(order);

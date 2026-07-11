@@ -44,7 +44,7 @@ public class OrderResponseMapper {
                                 .filter(ProductImage::getPrimary)
                                 .findFirst()
                                 .map(ProductImage::getImageUrl)
-                                .orElse(item.getProduct().getImages().get(0).getImageUrl());
+                                .orElse(item.getProduct().getImages().iterator().next().getImageUrl());
                     }
                     return new OrderItemResponse(
                             item.getId(),

@@ -25,7 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -107,7 +108,7 @@ public class OrderFacade {
         Order savedOrder = orderRepository.save(order);
 
         // 8. Create order items
-        List<OrderItem> items = createOrderItems(savedOrder, cart);
+        Set<OrderItem> items = createOrderItems(savedOrder, cart);
         savedOrder.setItems(items);
         orderRepository.save(savedOrder);
 
@@ -183,7 +184,7 @@ public class OrderFacade {
         return order;
     }
 
-    private List<OrderItem> createOrderItems(Order order, Cart cart) {
+    private Set<OrderItem> createOrderItems(Order order, Cart cart) {
         return cart.getItems().stream()
                 .map(cartItem -> {
                     OrderItem orderItem = new OrderItem();
@@ -196,7 +197,7 @@ public class OrderFacade {
                     orderItem.setUnitPrice(price);
                     return orderItem;
                 })
-                .toList();
+                .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
     }
 
     private BigDecimal calculateDiscount(Coupon coupon, BigDecimal subtotal) {

@@ -36,6 +36,7 @@ public class CartService {
         this.productRepository = productRepository;
     }
 
+    @Transactional(readOnly = true)
     public CartResponse getCart(UUID userId, UUID guestCartId) {
         Optional<Cart> cartOpt = Optional.empty();
 
