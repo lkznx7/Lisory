@@ -1,10 +1,12 @@
 package com.lisory.backend.produtos.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -61,8 +63,9 @@ public class Product {
     @Column(precision = 10, scale = 3)
     private BigDecimal length;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductImage> images = new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
+    private Set<ProductImage> images = new LinkedHashSet<>();
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -115,8 +118,8 @@ public class Product {
     public void setWidth(BigDecimal width) { this.width = width; }
     public BigDecimal getLength() { return length; }
     public void setLength(BigDecimal length) { this.length = length; }
-    public List<ProductImage> getImages() { return images; }
-    public void setImages(List<ProductImage> images) { this.images = images; }
+    public Set<ProductImage> getImages() { return images; }
+    public void setImages(Set<ProductImage> images) { this.images = images; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 }

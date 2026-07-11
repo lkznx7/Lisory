@@ -4,10 +4,12 @@ import com.lisory.backend.auth.entity.AuthEntity;
 import com.lisory.backend.cupons.entity.Coupon;
 import com.lisory.backend.user.entity.Address;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -56,8 +58,9 @@ public class Order {
     @Column(name = "guest_cpf", length = 14)
     private String guestCpf;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> items = new ArrayList<>();
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
+    private Set<OrderItem> items = new LinkedHashSet<>();
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -104,8 +107,8 @@ public class Order {
     public void setGuestPhone(String guestPhone) { this.guestPhone = guestPhone; }
     public String getGuestCpf() { return guestCpf; }
     public void setGuestCpf(String guestCpf) { this.guestCpf = guestCpf; }
-    public List<OrderItem> getItems() { return items; }
-    public void setItems(List<OrderItem> items) { this.items = items; }
+    public Set<OrderItem> getItems() { return items; }
+    public void setItems(Set<OrderItem> items) { this.items = items; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 }

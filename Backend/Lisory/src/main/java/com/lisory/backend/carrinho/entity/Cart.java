@@ -2,9 +2,11 @@ package com.lisory.backend.carrinho.entity;
 
 import com.lisory.backend.auth.entity.AuthEntity;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -21,8 +23,9 @@ public class Cart {
     @Column(name = "guest_cart_id", unique = true)
     private UUID guestCartId;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItem> items = new ArrayList<>();
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
+    private Set<CartItem> items = new LinkedHashSet<>();
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -49,8 +52,8 @@ public class Cart {
     public void setUser(AuthEntity user) { this.user = user; }
     public UUID getGuestCartId() { return guestCartId; }
     public void setGuestCartId(UUID guestCartId) { this.guestCartId = guestCartId; }
-    public List<CartItem> getItems() { return items; }
-    public void setItems(List<CartItem> items) { this.items = items; }
+    public Set<CartItem> getItems() { return items; }
+    public void setItems(Set<CartItem> items) { this.items = items; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 }
