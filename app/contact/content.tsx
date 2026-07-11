@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageCircle, Mail, Instagram } from "lucide-react";
+import { Mail, Instagram } from "lucide-react";
 
 export function ContactPageContent() {
   return (
@@ -17,22 +17,17 @@ export function ContactPageContent() {
         <div className="grid lg:grid-cols-2 gap-8">
           <div className="space-y-4">
             {[
-              {
-                icon: <MessageCircle size={20} />,
-                label: "WhatsApp",
-                value: "(11) 99999-0000",
-                sub: "Seg–Sex, 9h–18h",
-              },
+
               {
                 icon: <Mail size={20} />,
                 label: "E-mail",
-                value: "oi@lisory.com.br",
+                value: "Lisoryacessorios@gmail.com",
                 sub: "Resposta em até 24h",
               },
               {
                 icon: <Instagram size={20} />,
                 label: "Instagram",
-                value: "@lisory.scoop",
+                value: "@uselisory",
                 sub: "DM sempre aberto",
               },
             ].map((item) => (

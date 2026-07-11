@@ -16,7 +16,7 @@ export default function TermsContent() {
         <section>
           <h2 className="text-2xl font-serif text-foreground mb-4">2. Sobre a Lisory</h2>
           <p className="text-foreground/70 leading-relaxed">
-            A Lisory e uma plataforma de e-commerce especializada em venda de acessorios surpresa (Scoop Experience).
+            A Lisory e uma plataforma de e-commerce especializada em venda de acessorios surpresa.
             Nossos produtos sao caixas contendo selecoes de acessorios de joias em mix dourado e prata.
           </p>
         </section>
@@ -81,7 +81,7 @@ export default function TermsContent() {
         <section>
           <h2 className="text-2xl font-serif text-foreground mb-4">10. Contato</h2>
           <p className="text-foreground/70 leading-relaxed">
-            Duvidas sobre estes Termos? Entre em contato: oi@lisory.com.br ou via WhatsApp.
+            Duvidas sobre estes Termos? Entre em contato: Lisoryacessorios@gmail.com.
           </p>
         </section>
       </div>

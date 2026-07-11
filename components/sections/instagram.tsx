@@ -20,7 +20,7 @@ export function InstagramSection() {
           Siga-nos
         </p>
         <h2 className="font-['Cormorant_Garamond'] text-4xl font-light text-[#7A4B52] mb-2">
-          @lisory.scoop
+          @uselisory
         </h2>
       </div>
       <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">

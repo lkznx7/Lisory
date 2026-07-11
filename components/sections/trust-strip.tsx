@@ -1,10 +1,10 @@
-import { Gift, RefreshCw, Shield, Video } from "lucide-react";
+import { Droplets, Sparkles, Video, Truck } from "lucide-react";
 
 const items = [
-  { icon: Gift, text: "4 a 12 Acessórios" },
-  { icon: Video, text: "Vídeo Exclusivo" },
-  { icon: RefreshCw, text: "Até 5 Trocas" },
-  { icon: Shield, text: "Compra Segura" },
+  { icon: Droplets, text: "Pode molhar sem preocupação" },
+  { icon: Sparkles, text: "Não escurece com o uso" },
+  { icon: Video, text: "Vídeo exclusivo" },
+  { icon: Truck, text: "Envio para todo o Brasil" },
 ];
 
 export function TrustStrip() {

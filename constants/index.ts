@@ -1,12 +1,11 @@
 export const SITE = {
   name: "LISORY",
-  tagline: "Scoop Experience",
+  tagline: "É luxo? É Lisory!",
   description: "Acessórios surpresa selecionados especialmente para você. Mix dourado e prata em cada scoop.",
   url: "https://lisory.com.br",
-  email: "oi@lisory.com.br",
-  phone: "(11) 99999-0000",
-  instagram: "@lisory.scoop",
-  whatsapp: "(11) 99999-0000",
+  email: "Lisoryacessorios@gmail.com",
+  phone: "",
+  instagram: "@uselisory",
 };
 
 export const FREE_SHIPPING_THRESHOLD = 149;

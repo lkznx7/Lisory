@@ -4,7 +4,7 @@ import { CategoriesSection } from "@/components/sections/categories";
 import { BestsellersSection } from "@/components/sections/bestsellers";
 import { EditorialSection } from "@/components/sections/editorial";
 import { NewArrivalsSection } from "@/components/sections/new-arrivals";
-import { FlyerSection } from "@/components/sections/flyer";
+import { FlyerSlider } from "@/components/sections/flyer-slider";
 import { HorizontalBanner } from "@/components/sections/horizontal-banner";
 import { TestimonialsSection } from "@/components/sections/testimonials";
 import { InstagramSection } from "@/components/sections/instagram";
@@ -21,7 +21,7 @@ export default function HomePage() {
       <BestsellersSection />
       <EditorialSection />
       <NewArrivalsSection />
-      <FlyerSection />
+      <FlyerSlider />
       <TestimonialsSection />
       <InstagramSection />
       <HomeFaqSection />

@@ -4,7 +4,7 @@ export const products: Product[] = [
   {
     id: "scoop-1",
     name: "Primeira Surpresa",
-    price: 89,
+    price: 119.9,
     image: "/images/scoop-1.jpg",
     category: "Scoop",
     rating: 4.9,
@@ -15,7 +15,7 @@ export const products: Product[] = [
   {
     id: "scoop-2",
     name: "Brilho em Dobro",
-    price: 149,
+    price: 230,
     image: "/images/scoop-2.jpg",
     badge: "Mais Popular",
     category: "Scoop",
@@ -28,8 +28,7 @@ export const products: Product[] = [
   {
     id: "scoop-3",
     name: "Coleção de Sonhos",
-    price: 219,
-    originalPrice: 259,
+    price: 290,
     image: "/images/scoop-3.jpg",
     badge: "Novo",
     category: "Scoop",
@@ -42,7 +41,7 @@ export const products: Product[] = [
   {
     id: "scoop-4",
     name: "Experiência Premium",
-    price: 349,
+    price: 350,
     image: "/images/scoop-4.jpg",
     badge: "Premium",
     category: "Scoop",
@@ -51,6 +50,17 @@ export const products: Product[] = [
     description: "O nível máximo da experiência Lisory.\n\nVocê recebe:\n• 12 acessórios garantidos\n• Chance de ganhar acessórios extras\n• Mix dourado e prata\n• Vídeo exclusivo\n• Até 5 trocas\n\nMais acessórios, mais surpresas e muito mais emoção.",
     scoop: { items: 12, extra: true, exchanges: 5 },
     isBestseller: true,
+  },
+  {
+    id: "colar-sweet-cherry",
+    name: "Colar Sweet Cherry",
+    price: 69.9,
+    image: "/images/ColarSweetcherry.png",
+    category: "Pulseiras",
+    rating: 5.0,
+    reviews: 0,
+    description: "Colar Sweet Cherry - A elegância em forma de pingente.\n\nUma peça delicada e cheia de personalidade para complementar seu visual.",
+    isNew: true,
   },
 ];
 

@@ -60,7 +60,7 @@ export function Navbar() {
       >
         {/* Announcement bar */}
         <div className="bg-[#7A4B52] text-white text-center py-2 px-4 text-[10px] sm:text-[11px] tracking-widest font-light overflow-x-auto whitespace-nowrap scrollbar-none">
-          FRETE GRATIS ACIMA DE R$149 · TROCA GRATIS · EXPERIENCIA SCOOP
+          TROCA GRATIS · EXPERIENCIA SCOOP
         </div>
 
         <div className="h-16 lg:h-[72px] max-w-7xl mx-auto px-4 lg:px-6 flex items-center justify-between">

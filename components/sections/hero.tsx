@@ -27,16 +27,13 @@ export function HeroSection() {
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <p className="text-xs tracking-[0.4em] text-[#D97D93] uppercase mb-6">
-            Experiência Surpresa
+            é luxo? é lisory!
           </p>
           <h1 className="font-['Cormorant_Garamond'] text-4xl sm:text-5xl lg:text-7xl font-light text-[#7A4B52] leading-[1.1] mb-6">
-            A surpresa que<br />
-            <em>brilha</em>
-            <br />
-            com você.
+            Lisory
           </h1>
           <p className="text-[#6E5A5D] text-sm sm:text-base lg:text-lg leading-relaxed mb-8 sm:mb-10 max-w-md">
-            Descubra a experiência Lisory Scoop. Acessórios selecionados, mix dourado e prata, vídeo exclusivo e até 5 trocas.
+            Abra seu Scoop e descubra acessórios em aço inoxidável escolhidos para tornar seu momento ainda mais especial.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
@@ -55,11 +52,10 @@ export function HeroSection() {
           </div>
 
           <div className="flex flex-wrap gap-5 mt-12 pt-10 border-t border-[#F2DCDD]">
-            {["4 a 12 acessórios", "Mix dourado e prata", "Vídeo exclusivo", "Até 5 trocas"].map(
+            {["💎 Aço inoxidável", "🎀 Curadoria exclusiva", "✨ Detalhes que encantam", "🤍 Feito para surpreender"].map(
               (seal) => (
                 <div key={seal} className="flex items-center gap-2">
                   <div className="w-4 h-4 bg-[#D97D93] rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-[8px] font-bold">✓</span>
                   </div>
                   <span className="text-xs text-[#6E5A5D]">{seal}</span>
                 </div>

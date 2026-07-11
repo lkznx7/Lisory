@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Minus, Check, Gift, Sparkles, Video, RefreshCw, Shield } from "lucide-react";
+import { Plus, Minus, Check, Gift, Sparkles, Video, RefreshCw, Shield, Droplets } from "lucide-react";
 import type { Product } from "@/types";
 import { StarRating } from "./star-rating";
 import { useCart } from "@/hooks/use-cart";
@@ -57,7 +57,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
         <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#F2DCDD]">
           <Sparkles size={14} className="text-[#C8667F]" />
           <span className="text-sm text-[#C8667F] font-medium">
-            Mix dourado e prata · Vídeo exclusivo
+            Aço inoxidável · Não escurece
           </span>
         </div>
       </div>
@@ -74,7 +74,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             </div>
             <div className="flex items-center gap-2">
               <Sparkles size={14} className="text-[#D97D93]" />
-              <span className="text-sm text-[#6E5A5D]">Mix dourado e prata</span>
+              <span className="text-sm text-[#6E5A5D]">Aço inoxidável</span>
             </div>
             <div className="flex items-center gap-2">
               <Video size={14} className="text-[#D97D93]" />
@@ -148,9 +148,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
       <div className="grid grid-cols-2 gap-3">
         {[
           { icon: <Gift size={14} />, text: "Acessórios surpresa" },
-          { icon: <RefreshCw size={14} />, text: "Troca grátis" },
+          { icon: <Droplets size={14} />, text: "Pode molhar" },
           { icon: <Shield size={14} />, text: "Compra 100% segura" },
-          { icon: <Video size={14} />, text: "Vídeo da abertura" },
+          { icon: <Video size={14} />, text: "Vídeo exclusivo" },
         ].map((item) => (
           <div
             key={item.text}

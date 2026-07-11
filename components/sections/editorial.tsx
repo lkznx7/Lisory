@@ -3,13 +3,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "motion/react";
-import { Gift, Sparkles, Video, RefreshCw } from "lucide-react";
+import { Gem, Ribbon, Sparkles, Heart, Gift } from "lucide-react";
 
 const features = [
-  { icon: <Gift size={16} />, title: "Surpresa garantida", desc: "Cada scoop é montado especialmente para você" },
-  { icon: <Sparkles size={16} />, title: "Mix dourado e prata", desc: "Peças versáteis para todas as ocasiões" },
-  { icon: <Video size={16} />, title: "Vídeo exclusivo", desc: "Reviva a emoção da abertura quando quiser" },
-  { icon: <RefreshCw size={16} />, title: "Até 5 trocas", desc: "Garantia de satisfação em cada scoop" },
+  { icon: <Gem size={16} />, title: "Aço inoxidável", desc: "Peças que não escurecem e podem molhar" },
+  { icon: <Ribbon size={16} />, title: "Curadoria exclusiva", desc: "Cada scoop é montado especialmente para você" },
+  { icon: <Sparkles size={16} />, title: "Detalhes que encantam", desc: "Peças versáteis para todas as ocasiões" },
+  { icon: <Heart size={16} />, title: "Feito para surpreender", desc: "Garantia de satisfação em cada scoop" },
 ];
 
 export function EditorialSection() {
@@ -25,7 +25,7 @@ export function EditorialSection() {
         >
           <div className="relative aspect-[4/5] rounded-[20px] overflow-hidden bg-[#FCEEEF]">
             <Image
-              src="/images/flyer.jpg"
+              src="/images/flyer1.jpg"
               alt="Experiência Lisory"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
@@ -55,7 +55,7 @@ export function EditorialSection() {
             na <em>surpresa</em>.
           </h2>
           <p className="text-[#6E5A5D] leading-relaxed mb-8">
-            Cada scoop Lisory é uma experiência única. Selecionamos acessórios mix dourado e prata 
+            Cada scoop Lisory é uma experiência única. Selecionamos acessórios em aço inoxidável 
             e gravamos um vídeo exclusivo da sua abertura. São peças versáteis, lindas e 
             surpreendentes — escolhidas com carinho para você.
           </p>

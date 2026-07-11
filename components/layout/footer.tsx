@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Instagram, Mail, Phone } from "lucide-react";
+import { Instagram, Mail } from "lucide-react";
 
 export function Footer() {
   return (
@@ -11,16 +11,15 @@ export function Footer() {
               LISORY
             </p>
             <p className="text-[10px] tracking-[0.4em] text-[#F2DCDD] uppercase mb-5">
-              Scoop Experience
+               É luxo? É Lisory!
             </p>
             <p className="text-sm text-[#F2DCDD] leading-relaxed mb-6">
-              Acessorios surpresa selecionados especialmente para voce. Mix dourado e prata em cada scoop.
+              Acessórios surpresa selecionados especialmente para você. Aço inoxidável em cada scoop.
             </p>
             <div className="flex gap-3">
               {[
-                { icon: Instagram, href: "#" },
-                { icon: Mail, href: "mailto:oi@lisory.com.br" },
-                { icon: Phone, href: "tel:11999990000" },
+                { icon: Instagram, href: "https://instagram.com/uselisory" },
+                { icon: Mail, href: "mailto:Lisoryacessorios@gmail.com" },
               ].map(({ icon: Icon, href }, i) => (
                 <Link
                   key={i}

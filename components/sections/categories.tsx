@@ -14,12 +14,13 @@ const iconMap: Record<string, typeof Gift> = {
   prata: Sparkles,
 };
 
-const fallbackIcons = [Gift, Sparkles, Diamond, Crown];
+const fallbackIcons = [Gift, Sparkles, Diamond, Crown, Crown];
 const fallbackOptions = [
-  { name: "Primeira Surpresa", items: 4, price: "R$ 89", slug: "primeira-surpresa" },
-  { name: "Brilho em Dobro", items: 6, price: "R$ 149", slug: "brilho-em-dobro" },
-  { name: "Colecao de Sonhos", items: 9, price: "R$ 219", slug: "colecao-de-sonhos" },
-  { name: "Experiencia Premium", items: 12, price: "R$ 349", slug: "experiencia-premium" },
+  { name: "Primeira Surpresa", items: 4, price: "R$ 119,90", slug: "primeira-surpresa" },
+  { name: "Brilho em Dobro", items: 6, price: "R$ 230", slug: "brilho-em-dobro" },
+  { name: "Colecao de Sonhos", items: 9, price: "R$ 290", slug: "colecao-de-sonhos" },
+  { name: "Experiencia Premium", items: 12, price: "R$ 350", slug: "experiencia-premium" },
+  { name: "Pulseiras", items: 0, price: "Em breve", slug: "pulseiras" },
 ];
 
 export function CategoriesSection() {
@@ -71,7 +72,7 @@ export function CategoriesSection() {
         <h2 className="font-['Cormorant_Garamond'] text-3xl sm:text-4xl lg:text-5xl font-light text-[#7A4B52]">Nossos Scoops</h2>
         <p className="text-[#6E5A5D] text-sm mt-4 max-w-md mx-auto">Quanto maior o scoop, mais acessorios, mais surpresas e mais emocao.</p>
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
         {fallbackOptions.map((scoop, i) => {
           const Icon = fallbackIcons[i];
           return (
@@ -82,9 +83,13 @@ export function CategoriesSection() {
                 </div>
                 <h3 className="font-['Cormorant_Garamond'] text-lg sm:text-xl font-semibold text-[#7A4B52] mb-2">{scoop.name}</h3>
                 <p className="text-xs sm:text-sm text-[#6E5A5D] mb-3">{scoop.items} acessorios</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-base sm:text-lg font-bold text-[#D97D93]">{scoop.price}</span>
-                </div>
+                {scoop.slug === "pulseiras" ? (
+                  <span className="text-xs sm:text-sm text-[#6E5A5D] mt-2">Em breve</span>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-base sm:text-lg font-bold text-[#D97D93]">{scoop.price}</span>
+                  </div>
+                )}
               </Link>
             </motion.div>
           );

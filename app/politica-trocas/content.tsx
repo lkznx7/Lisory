@@ -94,7 +94,7 @@ export default function ExchangePolicyContent() {
           </h2>
           <div className="bg-white rounded-xl p-6 border border-foreground/10">
             <ol className="space-y-3 list-decimal list-inside">
-              <li>Entre em contato pelo WhatsApp ou email</li>
+              <li>Entre em contato pelo email</li>
               <li>Informe o numero do seu pedido</li>
               <li>Descreva o problema encontrado</li>
               <li>Anexe fotos do defeito, quando possivel</li>

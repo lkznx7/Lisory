@@ -27,7 +27,7 @@ export function AboutPageContent() {
           <div className="relative aspect-square rounded-[24px] overflow-hidden bg-[#FCEEEF]">
             <img
               src="/images/scoop-1.jpg"
-              alt="Lisory Scoop Experience"
+               alt="Lisory"
               className="w-full h-full object-cover"
             />
           </div>

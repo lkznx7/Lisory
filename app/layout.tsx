@@ -24,24 +24,23 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   metadataBase: new URL("https://lisory.com.br"),
   title: {
-    default: "LISORY - Scoop Experience | Acessorios Surpresa",
+    default: "LISORY - É luxo? É Lisory! | Acessórios Surpresa",
     template: "%s | LISORY",
   },
   description:
-    "Experiencia Lisory Scoop: acessorios surpresa mix dourado e prata com video exclusivo. Escolha seu scoop e surpreenda-se!",
+    "Lisory: acessórios surpresa em aço inoxidável. Abra seu Scoop e descubra peças exclusivas selecionadas para você.",
   keywords: [
     "scoop",
     "acessorios surpresa",
     "lisory",
     "joias",
-    "mix dourado e prata",
-    "experiencia",
+    "aco inoxidavel",
     "presente",
   ],
   openGraph: {
-    title: "LISORY - Scoop Experience",
+    title: "LISORY - É luxo? É Lisory!",
     description:
-      "Experiencia Lisory Scoop: acessorios surpresa mix dourado e prata com video exclusivo.",
+      "Lisory: acessórios surpresa em aço inoxidável.",
     siteName: "LISORY",
     locale: "pt_BR",
     type: "website",
@@ -52,10 +51,14 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icons/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/icons/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/favicon.ico", sizes: "any" },
     ],
-    apple: [{ url: "/apple-icon.svg" }],
+    apple: [{ url: "/icons/apple-touch-icon.png" }],
+    other: [
+      { rel: "manifest", url: "/icons/manifest.json" },
+    ],
   },
 };
 
