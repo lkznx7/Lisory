@@ -153,6 +153,10 @@ export function CheckoutPageContent() {
       toast.error(error);
       return;
     }
+    if (step === 3 && !selectedShipping) {
+      toast.error("Selecione uma opcao de frete para continuar");
+      return;
+    }
     setStep(step + 1);
   };
 

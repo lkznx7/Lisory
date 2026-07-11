@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
 import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface ApiCartItem {
   id: string;
@@ -76,6 +77,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback(
     async (productId: string, name: string, price: number, image: string, qty = 1) => {
+      const previousItems = items;
       setItems((prev) => {
         const existing = prev.find((i) => i.id === productId);
         if (existing) {
@@ -89,9 +91,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         await refreshCart();
       } catch (e) {
         console.error("Failed to add to cart:", e);
+        setItems(previousItems);
+        toast.error(e instanceof Error ? e.message : "Erro ao adicionar produto ao carrinho");
       }
     },
-    [refreshCart]
+    [items, refreshCart]
   );
 
   const removeItem = useCallback(
