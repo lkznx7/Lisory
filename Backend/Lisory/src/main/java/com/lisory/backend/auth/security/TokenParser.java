@@ -14,10 +14,10 @@ import java.util.Date;
 @Component
 public class TokenParser {
 
-    private final String secret;
+    private final SecretKey signingKey;
 
     public TokenParser(@Value("${jwt.secret}") String secret) {
-        this.secret = secret;
+        this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String extractUsername(String token) {
@@ -25,8 +25,12 @@ public class TokenParser {
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        try {
+            String username = extractUsername(token);
+            return username != null && username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {
@@ -46,6 +50,6 @@ public class TokenParser {
     }
 
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        return signingKey;
     }
 }

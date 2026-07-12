@@ -44,7 +44,12 @@ public class OrderController {
 
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> findById(@PathVariable UUID id) {
-        return ResponseEntity.ok(orderService.findById(id));
+        AuthEntity user = getCurrentUser();
+        OrderResponse order = orderService.findById(id);
+        if (order.userId() != null && !order.userId().equals(user.getId())) {
+            throw new com.lisory.backend.exception.ResourceNotFoundException("Order", "id", id);
+        }
+        return ResponseEntity.ok(order);
     }
 
     private AuthEntity getCurrentUser() {

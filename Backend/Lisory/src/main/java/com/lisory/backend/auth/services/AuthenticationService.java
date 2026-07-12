@@ -27,19 +27,23 @@ public class AuthenticationService {
             throw new EmailAlreadyExistsException(request.email());
         }
 
-        AuthEntity entity = new AuthEntity(request.email(), passwordEncoder.encode(request.password()));
+        AuthEntity entity = new AuthEntity(request.email().toLowerCase().trim(), passwordEncoder.encode(request.password()));
         authRepository.save(entity);
     }
 
     public AuthResponse authenticate(AuthRequest request) {
-        AuthEntity user = authRepository.findByEmail(request.email())
+        AuthEntity user = authRepository.findByEmail(request.email().toLowerCase().trim())
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
+        if (!user.isEnabled()) {
+            throw new InvalidCredentialsException("Account is disabled");
+        }
+
         String token = tokenProvider.generateToken(user.getEmail());
-        return new AuthResponse(token);
+        return new AuthResponse(token, "Bearer");
     }
 }

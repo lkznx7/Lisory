@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.HexFormat;
 
 @Component
@@ -44,7 +45,10 @@ public class MelhorEnvioWebhookSignatureValidator {
             byte[] hash = mac.doFinal(payload.getBytes(StandardCharsets.UTF_8));
             String expectedSignature = HexFormat.of().formatHex(hash);
 
-            boolean valid = expectedSignature.equalsIgnoreCase(signature);
+            boolean valid = MessageDigest.isEqual(
+                    expectedSignature.getBytes(StandardCharsets.UTF_8),
+                    signature.getBytes(StandardCharsets.UTF_8)
+            );
             if (!valid) {
                 log.warn("melhor_envio_webhook_invalid_signature");
             }

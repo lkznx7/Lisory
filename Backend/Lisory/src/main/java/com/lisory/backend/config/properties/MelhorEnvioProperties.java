@@ -9,5 +9,6 @@ public record MelhorEnvioProperties(
     String apiUrl,
     String userAgent,
     String callbackUrl,
-    String scopes
+    String scopes,
+    String originCep
 ) {}

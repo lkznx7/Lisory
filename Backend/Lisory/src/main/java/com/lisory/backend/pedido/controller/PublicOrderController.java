@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -42,7 +43,7 @@ public class PublicOrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> findById(@PathVariable UUID id) {
-        return ResponseEntity.ok(orderService.findById(id));
+    public ResponseEntity<?> findById(@PathVariable UUID id) {
+        return ResponseEntity.status(404).body(Map.of("error", "Endpoint not available"));
     }
 }

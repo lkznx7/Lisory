@@ -21,9 +21,21 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler({EmailAlreadyExistsException.class, InvalidCredentialsException.class, BusinessException.class, InvalidOperationException.class, MelhorEnvioException.class})
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<?> handleInvalidCredentials(InvalidCredentialsException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
+    }
+
+    @ExceptionHandler({EmailAlreadyExistsException.class, BusinessException.class, InvalidOperationException.class})
     public ResponseEntity<?> handleBusinessException(RuntimeException e) {
         return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    }
+
+    @ExceptionHandler(MelhorEnvioException.class)
+    public ResponseEntity<?> handleMelhorEnvioException(MelhorEnvioException e) {
+        log.error("melhorenvio_error", e);
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(Map.of("error", "Shipping service temporarily unavailable. Please try again."));
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -55,6 +67,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleGeneral(Exception e) {
         log.error("unhandled_exception", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Internal server error: " + (e.getMessage() != null ? e.getMessage() : "Unknown error")));
+                .body(Map.of("error", "An unexpected error occurred. Please try again later."));
     }
 }

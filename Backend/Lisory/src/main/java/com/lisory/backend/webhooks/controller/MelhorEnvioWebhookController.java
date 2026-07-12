@@ -36,7 +36,7 @@ public class MelhorEnvioWebhookController {
 
         if (!signatureValidator.isValid(payload, signature)) {
             logger.warn("webhook_invalid_signature", Map.of("gateway", "melhor-envio"));
-            return ResponseEntity.status(401).body(Map.of("status", "error", "message", "Invalid signature"));
+            return ResponseEntity.ok(Map.of("status", "error", "message", "Invalid signature"));
         }
 
         try {
@@ -48,10 +48,9 @@ public class MelhorEnvioWebhookController {
             webhookService.processEvent(event);
 
             logger.info("webhook_acknowledged", Map.of("gateway", "melhor-envio"));
-            return ResponseEntity.ok(Map.of("status", "ok"));
         } catch (Exception e) {
             logger.error("webhook_processing_error", Map.of("gateway", "melhor-envio"), e);
-            return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage() != null ? e.getMessage() : "Unknown error"));
         }
+        return ResponseEntity.ok(Map.of("status", "ok"));
     }
 }

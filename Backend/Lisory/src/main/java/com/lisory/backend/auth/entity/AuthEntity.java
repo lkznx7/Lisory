@@ -46,6 +46,26 @@ public class AuthEntity implements UserDetails {
     public String getUsername() {
         return this.email;
     }
+    @Override
+    public boolean isEnabled() {
+        return Boolean.TRUE.equals(isActive);
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
     public String getEmail() { return email; }

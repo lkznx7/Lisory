@@ -1,6 +1,8 @@
 package com.lisory.backend.pedido.services;
 
 import com.lisory.backend.auth.entity.AuthEntity;
+import com.lisory.backend.auth.entity.ROLES;
+import com.lisory.backend.auth.repository.AuthRepository;
 import com.lisory.backend.carrinho.entity.Cart;
 import com.lisory.backend.carrinho.entity.CartItem;
 import com.lisory.backend.carrinho.repository.CartItemRepository;
@@ -21,7 +23,6 @@ import com.lisory.backend.pedido.dto.OrderResponse;
 import com.lisory.backend.pedido.entity.Order;
 import com.lisory.backend.pedido.entity.OrderItem;
 import com.lisory.backend.pedido.entity.OrderStatus;
-import com.lisory.backend.pedido.repository.OrderItemRepository;
 import com.lisory.backend.pedido.repository.OrderRepository;
 import com.lisory.backend.produtos.entity.Product;
 import com.lisory.backend.produtos.repository.ProductRepository;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +48,6 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
     private final ProductRepository productRepository;
     private final AddressRepository addressRepository;
     private final CouponRepository couponRepository;
@@ -58,12 +59,12 @@ public class OrderService {
     private final ShipmentService shipmentService;
     private final ShipmentRepository shipmentRepository;
     private final OrderResponseMapper responseMapper;
+    private final AuthRepository authRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     public OrderService(OrderRepository orderRepository,
-                        OrderItemRepository orderItemRepository,
                         ProductRepository productRepository,
                         AddressRepository addressRepository,
                         CouponRepository couponRepository,
@@ -74,9 +75,9 @@ public class OrderService {
                         PaymentRepository paymentRepository,
                         ShipmentService shipmentService,
                         ShipmentRepository shipmentRepository,
-                        OrderResponseMapper responseMapper) {
+                        OrderResponseMapper responseMapper,
+                        AuthRepository authRepository) {
         this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
         this.productRepository = productRepository;
         this.addressRepository = addressRepository;
         this.couponRepository = couponRepository;
@@ -88,6 +89,7 @@ public class OrderService {
         this.shipmentService = shipmentService;
         this.shipmentRepository = shipmentRepository;
         this.responseMapper = responseMapper;
+        this.authRepository = authRepository;
     }
 
     public OrderResponse createFromCart(UUID userId, UUID guestCartId, OrderRequest request) {
@@ -259,13 +261,16 @@ public class OrderService {
                 "totalRevenue", totalRevenue != null ? totalRevenue : BigDecimal.ZERO,
                 "totalOrders", totalOrders,
                 "paidOrders", paidOrders,
-                "pendingOrders", pendingOrders
+                "pendingOrders", pendingOrders,
+                "totalProducts", productRepository.count(),
+                "totalCustomers", authRepository.countByRole(ROLES.USER)
         );
     }
 
     private BigDecimal calculateDiscount(Coupon coupon, BigDecimal subtotal) {
+        if (coupon == null) return BigDecimal.ZERO;
         if ("PERCENTAGE".equalsIgnoreCase(coupon.getDiscountType())) {
-            return subtotal.multiply(coupon.getDiscountValue()).divide(new BigDecimal("100"));
+            return subtotal.multiply(coupon.getDiscountValue()).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
         } else if ("FIXED".equalsIgnoreCase(coupon.getDiscountType())) {
             BigDecimal discount = coupon.getDiscountValue();
             return discount.compareTo(subtotal) > 0 ? subtotal : discount;

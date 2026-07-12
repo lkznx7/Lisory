@@ -30,10 +30,10 @@ public class AsaasWebhookController {
                     "gateway", "asaas",
                     "paymentId", event.payment() != null ? event.payment().id() : "unknown"
             ));
-            return ResponseEntity.ok().build();
         } catch (Exception e) {
             logger.error("webhook_processing_error", Map.of("gateway", "asaas"), e);
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(500).build();
         }
+        return ResponseEntity.ok().build();
     }
 }

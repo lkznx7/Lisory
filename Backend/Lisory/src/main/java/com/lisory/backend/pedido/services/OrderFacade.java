@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -102,20 +103,28 @@ public class OrderFacade {
         savedOrder.setItems(items);
         orderRepository.save(savedOrder);
 
+        decrementStock(cart);
+
         cartItemRepository.deleteByCartId(cart.getId());
 
         try {
             paymentService.initiatePayment(savedOrder.getId(), request.paymentMethod(), savedOrder.getTotal());
         } catch (Exception e) {
-            log.error("payment_initiation_failed_for_order_{}", savedOrder.getId(), e);
+            log.error("payment_initiation_failed_for_order_{} - order was created but payment could not be initiated", savedOrder.getId(), e);
         }
 
         return responseMapper.toResponse(savedOrder);
     }
 
+    @Transactional
     public OrderResponse confirmPayment(UUID orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
+
+        OrderStatus currentStatus = OrderStatus.valueOf(order.getStatus());
+        if (currentStatus != OrderStatus.AGUARDANDO_PAGAMENTO) {
+            throw new BusinessException("Order is not awaiting payment");
+        }
 
         order.setStatus(OrderStatus.PAGO.name());
         Order savedOrder = orderRepository.save(order);
@@ -178,6 +187,14 @@ public class OrderFacade {
         return order;
     }
 
+    private void decrementStock(Cart cart) {
+        for (CartItem cartItem : cart.getItems()) {
+            Product product = cartItem.getProduct();
+            int newStock = product.getStockQuantity() - cartItem.getQuantity();
+            product.setStockQuantity(Math.max(0, newStock));
+        }
+    }
+
     private Set<OrderItem> createOrderItems(Order order, Cart cart) {
         return cart.getItems().stream()
                 .map(cartItem -> {
@@ -197,7 +214,7 @@ public class OrderFacade {
     private BigDecimal calculateDiscount(Coupon coupon, BigDecimal subtotal) {
         if (coupon == null) return BigDecimal.ZERO;
         if ("PERCENTAGE".equalsIgnoreCase(coupon.getDiscountType())) {
-            return subtotal.multiply(coupon.getDiscountValue()).divide(new BigDecimal("100"));
+            return subtotal.multiply(coupon.getDiscountValue()).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
         } else if ("FIXED".equalsIgnoreCase(coupon.getDiscountType())) {
             BigDecimal discount = coupon.getDiscountValue();
             return discount.compareTo(subtotal) > 0 ? subtotal : discount;

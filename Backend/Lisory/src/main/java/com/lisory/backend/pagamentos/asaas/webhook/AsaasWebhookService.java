@@ -90,6 +90,7 @@ public class AsaasWebhookService {
         if (event == null) return null;
         return switch (event.toUpperCase()) {
             case "PAYMENT_RECEIVED", "PAYMENT_CONFIRMED" -> "APPROVED";
+            case "PAYMENT_CREATED" -> "PENDING";
             case "PAYMENT_OVERDUE" -> "EXPIRED";
             case "PAYMENT_DELETED", "PAYMENT_REFUNDED" -> "REFUNDED";
             default -> null;

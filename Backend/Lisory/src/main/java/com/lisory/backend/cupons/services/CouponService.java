@@ -185,6 +185,9 @@ public class CouponService {
             throw new BusinessException("Order value does not meet the minimum required value of " + coupon.getMinOrderValue());
         }
 
+        coupon.setUsedCount(coupon.getUsedCount() + 1);
+        couponRepository.save(coupon);
+
         return coupon;
     }
 

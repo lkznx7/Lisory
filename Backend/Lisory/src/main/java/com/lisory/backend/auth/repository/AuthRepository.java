@@ -13,5 +13,6 @@ public interface AuthRepository extends JpaRepository<AuthEntity, UUID> {
     boolean existsByEmail(String email);
     Optional<AuthEntity> findByEmail(String email);
     Page<AuthEntity> findByRole(ROLES role, Pageable pageable);
+    long countByRole(ROLES role);
     Page<AuthEntity> findByEmailContainingIgnoreCase(String email, Pageable pageable);
 }
