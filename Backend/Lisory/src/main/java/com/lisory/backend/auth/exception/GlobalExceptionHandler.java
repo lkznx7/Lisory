@@ -1,8 +1,10 @@
 package com.lisory.backend.auth.exception;
 
+import com.lisory.backend.envios.melhorenvio.exception.MelhorEnvioException;
 import com.lisory.backend.exception.BusinessException;
 import com.lisory.backend.exception.InvalidOperationException;
 import com.lisory.backend.exception.ResourceNotFoundException;
+import com.lisory.backend.pagamentos.infinitepay.exception.InfinitePayException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,7 +17,7 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({EmailAlreadyExistsException.class, InvalidCredentialsException.class, BusinessException.class, InvalidOperationException.class})
+    @ExceptionHandler({EmailAlreadyExistsException.class, InvalidCredentialsException.class, BusinessException.class, InvalidOperationException.class, InfinitePayException.class, MelhorEnvioException.class})
     public ResponseEntity<?> handleAuthException(RuntimeException e) {
         return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     }

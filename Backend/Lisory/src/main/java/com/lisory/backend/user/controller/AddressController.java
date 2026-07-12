@@ -56,6 +56,9 @@ public class AddressController {
 
     private AuthEntity getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (AuthEntity) authentication.getPrincipal();
+        if (authentication != null && authentication.getPrincipal() instanceof AuthEntity user) {
+            return user;
+        }
+        throw new com.lisory.backend.exception.ResourceNotFoundException("User", "authentication", null);
     }
 }

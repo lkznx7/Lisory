@@ -27,6 +27,8 @@ import com.lisory.backend.produtos.entity.Product;
 import com.lisory.backend.produtos.repository.ProductRepository;
 import com.lisory.backend.user.entity.Address;
 import com.lisory.backend.user.repository.AddressRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -56,6 +58,9 @@ public class OrderService {
     private final ShipmentService shipmentService;
     private final ShipmentRepository shipmentRepository;
     private final OrderResponseMapper responseMapper;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public OrderService(OrderRepository orderRepository,
                         OrderItemRepository orderItemRepository,
@@ -125,9 +130,7 @@ public class OrderService {
 
         Order order = new Order();
         if (userId != null) {
-            AuthEntity user = new AuthEntity();
-            user.setId(userId);
-            order.setUser(user);
+            order.setUser(entityManager.getReference(AuthEntity.class, userId));
         }
         order.setAddress(address);
         order.setCoupon(coupon);
@@ -243,17 +246,13 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public Map<String, Object> getDashboardStats() {
-        List<Order> allOrders = orderRepository.findAll();
-        BigDecimal totalRevenue = allOrders.stream()
-                .filter(o -> "PAGO".equals(o.getStatus()))
-                .map(Order::getTotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        long totalOrders = allOrders.size();
-        long paidOrders = allOrders.stream().filter(o -> "PAGO".equals(o.getStatus())).count();
-        long pendingOrders = allOrders.stream().filter(o -> "AGUARDANDO_PAGAMENTO".equals(o.getStatus())).count();
+        long totalOrders = orderRepository.count();
+        long paidOrders = orderRepository.countByStatus("PAGO");
+        long pendingOrders = orderRepository.countByStatus("AGUARDANDO_PAGAMENTO");
+        BigDecimal totalRevenue = orderRepository.sumTotalByStatus("PAGO");
 
         return Map.of(
-                "totalRevenue", totalRevenue,
+                "totalRevenue", totalRevenue != null ? totalRevenue : BigDecimal.ZERO,
                 "totalOrders", totalOrders,
                 "paidOrders", paidOrders,
                 "pendingOrders", pendingOrders

@@ -159,7 +159,7 @@ public class CouponService {
         }
 
         if (coupon.getExpiresAt() != null && coupon.getExpiresAt().isAfter(now)) {
-            return new CouponStatusResponse(coupon.getCode(), "scheduled", "Coupon is scheduled for future use");
+            return new CouponStatusResponse(coupon.getCode(), "active", "Coupon is active and valid");
         }
 
         return new CouponStatusResponse(coupon.getCode(), "active", "Coupon is active and valid");

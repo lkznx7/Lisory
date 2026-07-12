@@ -35,7 +35,7 @@ public class ShipmentService {
         return toResponse(saved);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public ShipmentResponse updateTracking(UUID orderId, String trackingCode, String carrier, String service) {
         Shipment shipment = shipmentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shipment", "orderId", orderId));

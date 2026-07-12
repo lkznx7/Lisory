@@ -21,6 +21,8 @@ import com.lisory.backend.pedido.repository.OrderRepository;
 import com.lisory.backend.produtos.entity.Product;
 import com.lisory.backend.user.entity.Address;
 import com.lisory.backend.user.repository.AddressRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +56,9 @@ public class OrderFacade {
     private final PaymentService paymentService;
     private final ShipmentService shipmentService;
     private final OrderResponseMapper responseMapper;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public OrderFacade(
             OrderRepository orderRepository,
@@ -169,9 +174,7 @@ public class OrderFacade {
                               BigDecimal subtotal, BigDecimal discount, OrderRequest request) {
         Order order = new Order();
         if (userId != null) {
-            AuthEntity user = new AuthEntity();
-            user.setId(userId);
-            order.setUser(user);
+            order.setUser(entityManager.getReference(AuthEntity.class, userId));
         }
         order.setAddress(address);
         order.setCoupon(coupon);

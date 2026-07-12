@@ -46,7 +46,7 @@ public class MelhorEnvioWebhookSignatureValidator {
 
             boolean valid = expectedSignature.equalsIgnoreCase(signature);
             if (!valid) {
-                log.warn("melhor_envio_webhook_invalid_signature expected={} received={}", expectedSignature, signature);
+                log.warn("melhor_envio_webhook_invalid_signature");
             }
             return valid;
         } catch (Exception e) {

@@ -77,7 +77,7 @@ public class ShippingController {
 
     public record FreightCalculationRequest(
             @NotBlank String zipCode,
-            @NotNull List<FreightItemRequest> items
+            @NotNull @Valid List<FreightItemRequest> items
     ) {}
 
     public record FreightItemRequest(

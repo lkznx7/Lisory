@@ -14,6 +14,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
 @Service
@@ -41,11 +43,11 @@ public class MelhorEnvioOAuthService {
                 : "cart-read cart-write orders-read shipping-calculate shipping-cancel shipping-checkout shipping-companies shipping-generate shipping-preview shipping-print shipping-share shipping-tracking";
 
         return properties.apiUrl() + "/oauth/authorize"
-                + "?client_id=" + properties.clientId()
-                + "&redirect_uri=" + properties.callbackUrl()
+                + "?client_id=" + URLEncoder.encode(properties.clientId(), StandardCharsets.UTF_8)
+                + "&redirect_uri=" + URLEncoder.encode(properties.callbackUrl(), StandardCharsets.UTF_8)
                 + "&response_type=code"
-                + "&state=" + state
-                + "&scope=" + scopes;
+                + "&state=" + URLEncoder.encode(state, StandardCharsets.UTF_8)
+                + "&scope=" + URLEncoder.encode(scopes, StandardCharsets.UTF_8);
     }
 
     public synchronized MelhorEnvioTokenResponse exchangeCodeForToken(String code) {

@@ -53,7 +53,7 @@ public class AdminCustomerController {
                     "phone", "",
                     "orderCount", orderCount,
                     "totalSpent", totalSpent,
-                    "createdAt", user.getActive().toString()
+                    "createdAt", user.getId() != null ? user.getId().toString() : ""
             );
         });
         return ResponseEntity.ok(result);

@@ -2,6 +2,9 @@ package com.lisory.backend.cupons.controller;
 
 import com.lisory.backend.cupons.dto.CouponResponse;
 import com.lisory.backend.cupons.services.CouponService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,10 +21,10 @@ public class PublicCouponController {
     }
 
     @PostMapping("/validate")
-    public ResponseEntity<CouponResponse> validate(@RequestBody ValidateCouponRequest request) {
+    public ResponseEntity<CouponResponse> validate(@Valid @RequestBody ValidateCouponRequest request) {
         couponService.validateAndApply(request.code(), request.orderValue(), null);
         return ResponseEntity.ok(couponService.findByCode(request.code()));
     }
 
-    record ValidateCouponRequest(String code, BigDecimal orderValue) {}
+    record ValidateCouponRequest(@NotBlank String code, @NotNull BigDecimal orderValue) {}
 }
