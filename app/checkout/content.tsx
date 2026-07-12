@@ -189,14 +189,14 @@ export function CheckoutPageContent() {
 
       const result = await api.post<{ id: string; paymentLink?: string }>("/orders/public", orderPayload);
 
-      await clearCart();
-      toast.success("Pedido realizado com sucesso!");
-
-      if (result.paymentLink) {
-        window.location.href = result.paymentLink;
-      } else {
-        router.push(`/confirmation?orderId=${result.id}`);
+      if (!result.paymentLink) {
+        toast.error("Erro ao gerar link de pagamento. Tente novamente.");
+        setLoading(false);
+        return;
       }
+
+      await clearCart();
+      window.location.href = result.paymentLink;
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro ao finalizar pedido");
     } finally {
