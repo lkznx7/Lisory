@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Backend (separate repo)
+Backend/
+
 # Next.js
 .next/
 out/
