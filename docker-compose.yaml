@@ -32,12 +32,11 @@ services:
         condition: service_healthy
     environment:
       # Database
-      DB_URL: jdbc:postgresql://db:5432/lisory
-      DB_USERNAME: postgres
-      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/lisory
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
       DB_DRIVER: org.postgresql.Driver
       DB_DIALECT: org.hibernate.dialect.PostgreSQLDialect
-      H2_CONSOLE_ENABLED: "false"
       # JWT
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
@@ -46,10 +45,11 @@ services:
       # Melhor Envio
       MELHOR_ENVIO_CLIENT_ID: ${MELHOR_ENVIO_CLIENT_ID:-26942}
       MELHOR_ENVIO_CLIENT_SECRET: ${MELHOR_ENVIO_CLIENT_SECRET:-}
-      MELHOR_ENVIO_API_URL: ${MELHOR_ENVIO_API_URL:-https://melhorenvio.com.br}
+      MELHOR_ENVIO_API_URL: ${MELHOR_ENVIO_API_URL:-https://api.melhorenvio.com.br}
       MELHOR_ENVIO_USER_AGENT: "Lisory (contato@lisory.com.br)"
       MELHOR_ENVIO_CALLBACK_URL: ${MELHOR_ENVIO_CALLBACK_URL:-https://lisory.com.br/api/integrations/melhor-envio/oauth/callback}
       MELHOR_ENVIO_SCOPES: ${MELHOR_ENVIO_SCOPES:-cart-read cart-write orders-read shipping-calculate shipping-cancel shipping-checkout shipping-companies shipping-generate shipping-preview shipping-print shipping-share shipping-tracking}
+      MELHOR_ENVIO_ORIGIN_CEP: ${MELHOR_ENVIO_ORIGIN_CEP:-01310-100}
       # Asaas (sandbox: https://sandbox.asaas.com/api/v3, production: https://api.asaas.com/api/v3)
       ASAAS_API_KEY: ${ASAAS_API_KEY:-}
       ASAAS_API_URL: ${ASAAS_API_URL:-https://sandbox.asaas.com/api/v3}

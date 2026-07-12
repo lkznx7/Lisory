@@ -1,30 +1,43 @@
 # ============================
-# Lisory Backend — Dockerfile
-# Multi-stage build: Maven → JRE
+# Lisory Frontend — Dockerfile
+# Multi-stage build: Node.js → Next.js standalone
 # ============================
 
-# --- Stage 1: Build ---
-FROM maven:3.9-eclipse-temurin-21 AS build
+# --- Stage 1: Dependencies ---
+FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Copy POM first for dependency caching
-COPY Backend/Lisory/pom.xml .
-RUN mvn dependency:go-offline -B
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
 
-# Copy source and build
-COPY Backend/Lisory/src ./src
-RUN mvn package -DskipTests -B
-
-# --- Stage 2: Runtime ---
-FROM eclipse-temurin:21-jre-alpine AS runtime
+# --- Stage 2: Build ---
+FROM node:20-alpine AS build
 WORKDIR /app
 
-# Non-root user for security
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+ARG NEXT_PUBLIC_API_URL=https://lisory.com.br
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+RUN npm run build
+
+# --- Stage 3: Runtime ---
+FROM node:20-alpine AS runtime
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+COPY --from=build --chown=appuser:appgroup /app/.next/standalone ./
+COPY --from=build --chown=appuser:appgroup /app/.next/static ./.next/static
+COPY --from=build --chown=appuser:appgroup /app/public ./public
+
 USER appuser
 
-COPY --from=build /app/target/*.jar app.jar
+EXPOSE 3000
 
-EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["node", "server.js"]
