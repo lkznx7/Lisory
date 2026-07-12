@@ -5,11 +5,14 @@ import com.lisory.backend.exception.BusinessException;
 import com.lisory.backend.exception.InvalidOperationException;
 import com.lisory.backend.exception.ResourceNotFoundException;
 import com.lisory.backend.pagamentos.infinitepay.exception.InfinitePayException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,8 +20,10 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler({EmailAlreadyExistsException.class, InvalidCredentialsException.class, BusinessException.class, InvalidOperationException.class, InfinitePayException.class, MelhorEnvioException.class})
-    public ResponseEntity<?> handleAuthException(RuntimeException e) {
+    public ResponseEntity<?> handleBusinessException(RuntimeException e) {
         return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     }
 
@@ -40,9 +45,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(Map.of("error", details));
     }
 
+    @ExceptionHandler(ResourceAccessException.class)
+    public ResponseEntity<?> handleResourceAccessException(ResourceAccessException e) {
+        log.error("external_service_unreachable", e);
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(Map.of("error", "External service temporarily unavailable. Please try again."));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGeneral(Exception e) {
+        log.error("unhandled_exception", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Internal server error"));
+                .body(Map.of("error", "Internal server error: " + (e.getMessage() != null ? e.getMessage() : "Unknown error")));
     }
 }

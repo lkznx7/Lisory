@@ -11,6 +11,7 @@ import com.lisory.backend.envios.services.ShippingQuote;
 import com.lisory.backend.exception.BusinessException;
 import com.lisory.backend.exception.ResourceNotFoundException;
 import com.lisory.backend.cupons.entity.Coupon;
+import com.lisory.backend.pagamentos.dto.PaymentResponse;
 import com.lisory.backend.pagamentos.services.PaymentService;
 import com.lisory.backend.pedido.dto.OrderRequest;
 import com.lisory.backend.pedido.dto.OrderResponse;
@@ -23,30 +24,22 @@ import com.lisory.backend.user.entity.Address;
 import com.lisory.backend.user.repository.AddressRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.math.BigDecimal;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Orchestrates the checkout flow:
- * 1. Validate cart
- * 2. Calculate subtotal
- * 3. Apply coupon (optional)
- * 4. Create order with AGUARDANDO_PAGAMENTO status
- * 5. Set shipping cost from selected option
- * 6. Create payment (NOT process it - wait for webhook)
- * 7. Return order with payment link
- *
- * IMPORTANT: Shipment is NOT created at this point.
- * It will be created when payment is confirmed via webhook.
- */
 @Service
-@Transactional
 public class OrderFacade {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderFacade.class);
 
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
@@ -79,22 +72,17 @@ public class OrderFacade {
         this.responseMapper = responseMapper;
     }
 
+    @Transactional
     public OrderResponse checkout(UUID userId, UUID guestCartId, OrderRequest request) {
-        // 1. Find cart
         Cart cart = findCart(userId, guestCartId);
 
-        // 2. Validate cart is not empty
         if (cart.getItems().isEmpty()) {
             throw new BusinessException("Cart is empty");
         }
 
-        // 3. Resolve address
         Address address = resolveAddress(request.addressId());
-
-        // 4. Calculate subtotal
         BigDecimal subtotal = calculateSubtotal(cart);
 
-        // 5. Apply coupon
         BigDecimal discount = BigDecimal.ZERO;
         Coupon coupon = null;
         if (request.couponCode() != null && !request.couponCode().isBlank()) {
@@ -102,29 +90,46 @@ public class OrderFacade {
             discount = calculateDiscount(coupon, subtotal);
         }
 
-        // 6. Set shipping cost from selected option
         BigDecimal shippingCost = request.shippingCost() != null ? request.shippingCost() : BigDecimal.ZERO;
 
-        // 7. Create order
         Order order = createOrder(userId, address, coupon, subtotal, discount, request);
         order.setStatus(OrderStatus.AGUARDANDO_PAGAMENTO.name());
         order.setShippingCost(shippingCost);
         order.setTotal(subtotal.subtract(discount).add(shippingCost));
         Order savedOrder = orderRepository.save(order);
 
-        // 8. Create order items
         Set<OrderItem> items = createOrderItems(savedOrder, cart);
         savedOrder.setItems(items);
         orderRepository.save(savedOrder);
 
-        // 9. Initiate payment (creates payment record, returns payment link)
-        paymentService.initiatePayment(savedOrder.getId(), request.paymentMethod(), savedOrder.getTotal());
-
-        // 10. Clear cart
         cartItemRepository.deleteByCartId(cart.getId());
 
-        // 11. Return order response
-        return responseMapper.toResponse(savedOrder);
+        OrderResponse response = responseMapper.toResponse(savedOrder);
+
+        UUID orderId = savedOrder.getId();
+        String paymentMethod = request.paymentMethod();
+        BigDecimal total = savedOrder.getTotal();
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    try {
+                        paymentService.initiatePayment(orderId, paymentMethod, total);
+                    } catch (Exception e) {
+                        log.error("payment_initiation_failed_after_commit", e);
+                    }
+                }
+            });
+        } else {
+            try {
+                paymentService.initiatePayment(orderId, paymentMethod, total);
+            } catch (Exception e) {
+                log.error("payment_initiation_failed", e);
+            }
+        }
+
+        return response;
     }
 
     public OrderResponse confirmPayment(UUID orderId) {
@@ -134,8 +139,6 @@ public class OrderFacade {
         order.setStatus(OrderStatus.PAGO.name());
         Order savedOrder = orderRepository.save(order);
 
-        // Create shipment after payment confirmed
-        // Shipping details will be set by the shipping service when label is bought
         ShippingQuote defaultQuote = new ShippingQuote("PAC", "PAC", BigDecimal.ZERO, 0);
         shipmentService.createShipment(orderId, defaultQuote);
 
@@ -204,6 +207,7 @@ public class OrderFacade {
     }
 
     private BigDecimal calculateDiscount(Coupon coupon, BigDecimal subtotal) {
+        if (coupon == null) return BigDecimal.ZERO;
         if ("PERCENTAGE".equalsIgnoreCase(coupon.getDiscountType())) {
             return subtotal.multiply(coupon.getDiscountValue()).divide(new BigDecimal("100"));
         } else if ("FIXED".equalsIgnoreCase(coupon.getDiscountType())) {
