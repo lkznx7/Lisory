@@ -41,7 +41,7 @@ export function mapApiProductToProduct(api: ApiProduct): Product {
     image: primaryImage?.imageUrl || "/images/placeholder.jpg",
     category: api.categoryName || "Scoop",
     rating: 4.9,
-    reviews: Math.floor(Math.random() * 200) + 50,
+    reviews: Math.abs(api.name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) % 150) + 50,
     badge: api.featured ? "Mais Popular" : hasDiscount ? "Oferta" : undefined,
     description: api.description,
   };

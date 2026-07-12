@@ -59,6 +59,7 @@ const typeLabel: Record<string, string> = {
 
 export default function AdminCupons() {
   const [coupons, setCoupons] = useState<AdminCoupon[]>([]);
+  const [couponStatuses, setCouponStatuses] = useState<Record<string, CouponStatus>>({});
   const [statusFilters, setStatusFilters] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -76,13 +77,26 @@ export default function AdminCupons() {
     description: "",
   });
 
+  function computeCouponStatus(c: AdminCoupon): CouponStatus {
+    const now = new Date();
+    const expiresAt = c.endDate ? new Date(c.endDate) : null;
+    if (!c.isActive) return "inactive";
+    if (expiresAt && expiresAt < now) return "expired";
+    if (c.usageLimit > 0 && c.usedCount >= c.usageLimit) return "exhausted";
+    return "active";
+  }
+
   useEffect(() => {
     async function load() {
       const data = await CouponService.list();
       setCoupons(data);
-      const filters: Record<string, boolean> = {};
+      const statuses: Record<string, CouponStatus> = {};
       for (const c of data) {
-        const status = await CouponService.getStatus(c);
+        statuses[c.id] = computeCouponStatus(c);
+      }
+      setCouponStatuses(statuses);
+      const filters: Record<string, boolean> = {};
+      for (const status of Object.values(statuses)) {
         filters[status] = true;
       }
       setStatusFilters(filters);
@@ -94,25 +108,6 @@ export default function AdminCupons() {
   const activeStatuses = Object.entries(statusFilters)
     .filter(([, v]) => v)
     .map(([k]) => k);
-
-  const filtered = coupons.filter((c) => {
-    // we compute status in the filter
-    return true; // we'll compute below
-  });
-
-  // We need status for each coupon, so compute in render
-  const [couponStatuses, setCouponStatuses] = useState<Record<string, CouponStatus>>({});
-
-  useEffect(() => {
-    async function computeStatuses() {
-      const map: Record<string, CouponStatus> = {};
-      for (const c of coupons) {
-        map[c.id] = await CouponService.getStatus(c);
-      }
-      setCouponStatuses(map);
-    }
-    if (coupons.length > 0) computeStatuses();
-  }, [coupons]);
 
   const displayed = coupons.filter((c) => {
     const s = couponStatuses[c.id];

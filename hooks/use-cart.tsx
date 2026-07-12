@@ -77,7 +77,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback(
     async (productId: string, name: string, price: number, image: string, qty = 1) => {
-      const previousItems = items;
       setItems((prev) => {
         const existing = prev.find((i) => i.id === productId);
         if (existing) {
@@ -90,29 +89,36 @@ export function CartProvider({ children }: { children: ReactNode }) {
         await api.post<ApiCartResponse>("/cart/items", { productId: productId, quantity: qty });
         await refreshCart();
       } catch (e) {
-        console.error("Failed to add to cart:", e);
-        setItems(previousItems);
+        setItems((prev) => {
+          const existing = prev.find((i) => i.id === productId);
+          if (existing && existing.qty > qty) {
+            return prev.map((i) => (i.id === productId ? { ...i, qty: i.qty - qty } : i));
+          }
+          return prev.filter((i) => i.id !== productId);
+        });
         toast.error(e instanceof Error ? e.message : "Erro ao adicionar produto ao carrinho");
       }
     },
-    [items, refreshCart]
+    [refreshCart]
   );
 
   const removeItem = useCallback(
     async (id: string) => {
-      const item = items.find((i) => i.id === id);
       setItems((prev) => prev.filter((i) => i.id !== id));
 
-      if (item?.backendCartItemId) {
-        try {
-          await api.delete(`/cart/items/${item.backendCartItemId}`);
-          await refreshCart();
-        } catch (e) {
-          console.error("Failed to remove from cart:", e);
+      try {
+        const currentState = await api.get<ApiCartResponse>("/cart");
+        const backendItem = currentState.items.find((i) => i.productId === id);
+        if (backendItem) {
+          await api.delete(`/cart/items/${backendItem.id}`);
         }
+        await refreshCart();
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Erro ao remover produto");
+        await refreshCart();
       }
     },
-    [items, refreshCart]
+    [refreshCart]
   );
 
   const updateQuantity = useCallback(
@@ -123,25 +129,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       setItems((prev) => prev.map((i) => (i.id === id ? { ...i, qty } : i)));
 
-      const item = items.find((i) => i.id === id);
-      if (item?.backendCartItemId) {
-        try {
-          await api.put(`/cart/items/${item.backendCartItemId}`, { quantity: qty });
-          await refreshCart();
-        } catch (e) {
-          console.error("Failed to update cart:", e);
+      try {
+        const currentState = await api.get<ApiCartResponse>("/cart");
+        const backendItem = currentState.items.find((i) => i.productId === id);
+        if (backendItem) {
+          await api.put(`/cart/items/${backendItem.id}`, { quantity: qty });
         }
+        await refreshCart();
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Erro ao atualizar quantidade");
+        await refreshCart();
       }
     },
-    [items, refreshCart, removeItem]
+    [refreshCart, removeItem]
   );
 
   const clearCart = useCallback(async () => {
     setItems([]);
     try {
       await api.delete("/cart");
-    } catch (e) {
-      console.error("Failed to clear cart:", e);
+    } catch {
+      // Silently handle cart clear failure
     }
   }, []);
 

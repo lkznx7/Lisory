@@ -104,15 +104,12 @@ export function CheckoutPageContent() {
         height: 5,
         length: 20,
       }));
-      console.log("[CHECKOUT] Calculating freight for CEP:", zipCode, "items:", freightItems.length);
       const options = await shippingService.calculateFreight({ zipCode, items: freightItems });
-      console.log("[CHECKOUT] Freight options received:", options.length);
       setShippingOptions(options);
       if (options.length > 0) {
         setSelectedShipping(options[0]);
       }
-    } catch (error) {
-      console.error("[CHECKOUT] Freight calculation error:", error);
+    } catch {
       setShippingOptions([{ carrier: "PAC", service: "PAC", cost: 0, estimatedDays: 10 }]);
     } finally {
       setLoadingShipping(false);
@@ -128,11 +125,9 @@ export function CheckoutPageContent() {
   const handleCepBlur = async (value: string) => {
     const cep = value.replace(/\D/g, "");
     if (cep.length !== 8) return;
-    console.log("CEP digitado:", cep);
     try {
       const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
       const dataCep: ViaCepResponse = await res.json();
-      console.log("[CHECKOUT] ViaCEP response:", dataCep);
       if (!dataCep.erro) {
         setData((prev) => ({
           ...prev,
@@ -142,8 +137,8 @@ export function CheckoutPageContent() {
           state: dataCep.uf || prev.state,
         }));
       }
-    } catch (err) {
-      console.error("[CHECKOUT] ViaCEP error:", err);
+    } catch {
+      // ViaCEP lookup failed silently
     }
   };
 
@@ -192,26 +187,17 @@ export function CheckoutPageContent() {
         shippingCost: selectedShipping?.cost || 0,
       };
 
-      console.log("[CHECKOUT] Submitting order:", {
-        customer: orderPayload.guestName,
-        paymentMethod: orderPayload.paymentMethod,
-        shippingCost: orderPayload.shippingCost,
-      });
       const result = await api.post<{ id: string; paymentLink?: string }>("/orders/public", orderPayload);
-      console.log("[CHECKOUT] Order created:", { orderId: result.id, hasPaymentLink: !!result.paymentLink });
 
       await clearCart();
       toast.success("Pedido realizado com sucesso!");
 
       if (result.paymentLink) {
-        console.log("[CHECKOUT] Redirecting to Asaas checkout:", result.paymentLink.substring(0, 60) + "...");
         window.location.href = result.paymentLink;
       } else {
-        console.log("[CHECKOUT] No paymentLink, redirecting to confirmation");
         router.push(`/confirmation?orderId=${result.id}`);
       }
     } catch (err) {
-      console.error("[CHECKOUT] Order creation error:", err);
       toast.error(err instanceof Error ? err.message : "Erro ao finalizar pedido");
     } finally {
       setLoading(false);
@@ -284,6 +270,7 @@ export function CheckoutPageContent() {
                         placeholder={field.placeholder}
                         value={data[field.field]}
                         onChange={(e) => updateField(field.field, e.target.value)}
+                        maxLength={field.field === "guestName" ? 255 : field.field === "guestEmail" ? 255 : field.field === "guestCpf" ? 14 : 20}
                         className="w-full h-12 px-4 border border-[#F2DCDD] rounded-xl text-sm text-[#7A4B52] placeholder-[#6E5A5D] outline-none focus:border-[#D97D93] transition-colors bg-white"
                       />
                     </div>
@@ -314,6 +301,7 @@ export function CheckoutPageContent() {
                         value={data[field.field]}
                         onChange={(e) => updateField(field.field, e.target.value)}
                         onBlur={field.field === "zipCode" ? (e) => handleCepBlur(e.target.value) : undefined}
+                        maxLength={field.field === "zipCode" ? 8 : field.field === "street" ? 255 : field.field === "number" ? 10 : field.field === "complement" ? 100 : field.field === "neighborhood" ? 100 : field.field === "city" ? 100 : 2}
                         className="w-full h-12 px-4 border border-[#F2DCDD] rounded-xl text-sm text-[#7A4B52] placeholder-[#6E5A5D] outline-none focus:border-[#D97D93] transition-colors bg-white"
                       />
                     </div>

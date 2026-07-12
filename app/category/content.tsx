@@ -16,6 +16,7 @@ import type { Product } from "@/types";
 export function CategoryPageContent() {
   const searchParams = useSearchParams();
   const categorySlug = searchParams.get("category");
+  const searchQuery = searchParams.get("search");
 
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sort, setSort] = useState("Mais Vendidos");
@@ -32,7 +33,9 @@ export function CategoryPageContent() {
       .then((cats) => {
         if (cats && cats.length > 0) setCategories(cats);
       })
-      .catch(() => {});
+      .catch(() => {
+        // Categories unavailable, filters will use fallback
+      });
   }, []);
 
   useEffect(() => {
@@ -46,8 +49,9 @@ export function CategoryPageContent() {
     if (priceRange[1] < 500) params.set("maxPrice", String(priceRange[1]));
 
     const query = params.toString();
+    const searchParam = searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : "";
     api
-      .get<{ content: ApiProduct[] }>(`/products?size=50${query ? `&${query}` : ""}`)
+      .get<{ content: ApiProduct[] }>(`/products?size=50${query ? `&${query}` : ""}${searchParam}`)
       .then((data) => {
         if (data && data.content && data.content.length > 0) {
           setProducts(data.content.map(mapApiProductToProduct));
@@ -62,6 +66,12 @@ export function CategoryPageContent() {
 
     function applyFallback() {
       let filtered = [...fallbackProducts];
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        filtered = filtered.filter(
+          (p) => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q))
+        );
+      }
       if (selectedCategory) {
         const catName = categories.find((c) => c.slug === selectedCategory)?.name;
         if (catName) {
@@ -76,7 +86,7 @@ export function CategoryPageContent() {
       }
       setProducts(filtered);
     }
-  }, [selectedCategory, priceRange, categories]);
+  }, [selectedCategory, priceRange, categories, searchQuery]);
 
   const sortedProducts = [...products].sort((a, b) => {
     switch (sort) {

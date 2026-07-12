@@ -1,8 +1,48 @@
 "use client";
 
-import { Mail, Instagram } from "lucide-react";
+import { useState } from "react";
+import { Mail, Instagram, Send, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
 
 export function ContactPageContent() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim() || !email.trim() || !message.trim()) {
+      toast.error("Preencha nome, e-mail e mensagem.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.lisory.com.br";
+      const res = await fetch(`${API_URL}/api/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), subject: subject.trim(), message: message.trim() }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Erro ao enviar mensagem.");
+      }
+      setSubmitted(true);
+      toast.success("Mensagem enviada com sucesso!");
+      setName("");
+      setEmail("");
+      setSubject("");
+      setMessage("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao enviar mensagem. Tente novamente.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <main className="pt-[88px] lg:pt-[96px] min-h-screen bg-[#FFF9F8]">
       <div className="max-w-5xl mx-auto px-4 lg:px-6 py-20">
@@ -17,7 +57,6 @@ export function ContactPageContent() {
         <div className="grid lg:grid-cols-2 gap-8">
           <div className="space-y-4">
             {[
-
               {
                 icon: <Mail size={20} />,
                 label: "E-mail",
@@ -55,38 +94,89 @@ export function ContactPageContent() {
             <h3 className="font-['Cormorant_Garamond'] text-2xl font-semibold text-[#7A4B52]">
               Envie uma mensagem
             </h3>
-            {[
-              { label: "Nome", placeholder: "Seu nome" },
-              { label: "E-mail", placeholder: "seu@email.com", type: "email" },
-              {
-                label: "Assunto",
-                placeholder: "Dúvida, troca, sugestão...",
-              },
-            ].map((f) => (
-              <div key={f.label}>
-                <label className="block text-xs font-semibold text-[#7A4B52] mb-2">
-                  {f.label}
-                </label>
-                <input
-                  type={f.type || "text"}
-                  placeholder={f.placeholder}
-                  className="w-full h-12 px-4 border border-[#F2DCDD] rounded-xl text-sm text-[#7A4B52] placeholder-[#6E5A5D] outline-none focus:border-[#D97D93] bg-[#FFF9F8] transition-colors"
-                />
+            {submitted ? (
+              <div className="flex flex-col items-center justify-center py-10 gap-3">
+                <CheckCircle className="size-10 text-[#3E8B5A]" />
+                <p className="text-sm font-medium text-[#7A4B52]">Mensagem enviada!</p>
+                <p className="text-xs text-[#6E5A5D]">Responderemos em até 24h.</p>
+                <button
+                  type="button"
+                  onClick={() => setSubmitted(false)}
+                  className="mt-2 text-xs text-[#D97D93] underline"
+                >
+                  Enviar outra mensagem
+                </button>
               </div>
-            ))}
-            <div>
-              <label className="block text-xs font-semibold text-[#7A4B52] mb-2">
-                Mensagem
-              </label>
-              <textarea
-                rows={4}
-                placeholder="Escreva sua mensagem..."
-                className="w-full px-4 py-3 border border-[#F2DCDD] rounded-xl text-sm text-[#7A4B52] placeholder-[#6E5A5D] outline-none focus:border-[#D97D93] bg-[#FFF9F8] transition-colors resize-none"
-              />
-            </div>
-            <button className="w-full h-12 bg-[#D97D93] hover:bg-[#C8667F] text-white text-sm font-semibold rounded-xl transition-colors">
-              Enviar Mensagem
-            </button>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label className="block text-xs font-semibold text-[#7A4B52] mb-2">
+                    Nome
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Seu nome"
+                    maxLength={150}
+                    className="w-full h-12 px-4 border border-[#F2DCDD] rounded-xl text-sm text-[#7A4B52] placeholder-[#6E5A5D] outline-none focus:border-[#D97D93] bg-[#FFF9F8] transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#7A4B52] mb-2">
+                    E-mail
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="seu@email.com"
+                    maxLength={255}
+                    className="w-full h-12 px-4 border border-[#F2DCDD] rounded-xl text-sm text-[#7A4B52] placeholder-[#6E5A5D] outline-none focus:border-[#D97D93] bg-[#FFF9F8] transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#7A4B52] mb-2">
+                    Assunto
+                  </label>
+                  <input
+                    type="text"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    placeholder="Dúvida, troca, sugestão..."
+                    maxLength={200}
+                    className="w-full h-12 px-4 border border-[#F2DCDD] rounded-xl text-sm text-[#7A4B52] placeholder-[#6E5A5D] outline-none focus:border-[#D97D93] bg-[#FFF9F8] transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#7A4B52] mb-2">
+                    Mensagem
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Escreva sua mensagem..."
+                    maxLength={2000}
+                    className="w-full px-4 py-3 border border-[#F2DCDD] rounded-xl text-sm text-[#7A4B52] placeholder-[#6E5A5D] outline-none focus:border-[#D97D93] bg-[#FFF9F8] transition-colors resize-none"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full h-12 bg-[#D97D93] hover:bg-[#C8667F] disabled:opacity-60 text-white text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+                >
+                  {submitting ? (
+                    <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  ) : (
+                    <>
+                      <Send className="size-4" />
+                      Enviar Mensagem
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>

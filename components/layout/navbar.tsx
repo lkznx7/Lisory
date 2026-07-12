@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Search,
@@ -32,9 +32,11 @@ const scoopLinks = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [megaMenu, setMegaMenu] = useState<string | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
   const { totalCount: cartCount } = useCart();
   const { items: wishlist } = useWishlist();
   const { user, isAdmin, logout, isLoading } = useAuth();
@@ -253,6 +255,15 @@ export function Navbar() {
                     autoFocus
                     className="flex-1 bg-transparent text-sm text-[#7A4B52] placeholder-[#6E5A5D] outline-none"
                     placeholder="Pesquisar scoops..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && searchQuery.trim()) {
+                        router.push(`/category?search=${encodeURIComponent(searchQuery.trim())}`);
+                        setSearchOpen(false);
+                        setSearchQuery("");
+                      }
+                    }}
                   />
                   <button onClick={() => setSearchOpen(false)} aria-label="Fechar busca">
                     <X size={16} className="text-[#6E5A5D] hover:text-[#7A4B52]" />

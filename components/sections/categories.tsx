@@ -34,7 +34,9 @@ export function CategoriesSection() {
           setCategories(data);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        // Categories unavailable, fallback UI will be shown
+      });
   }, []);
 
   if (categories.length > 0) {

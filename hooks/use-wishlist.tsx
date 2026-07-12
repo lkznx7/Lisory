@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
 
 interface WishlistContextType {
   items: string[];
@@ -10,8 +10,22 @@ interface WishlistContextType {
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
+function loadWishlist(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const stored = localStorage.getItem("lisory_wishlist");
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
 export function WishlistProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<string[]>([]);
+  const [items, setItems] = useState<string[]>(loadWishlist);
+
+  useEffect(() => {
+    localStorage.setItem("lisory_wishlist", JSON.stringify(items));
+  }, [items]);
 
   const toggleItem = useCallback((id: string) => {
     setItems((prev) =>

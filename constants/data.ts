@@ -64,6 +64,13 @@ export const products: Product[] = [
   },
 ];
 
+const slugMap: Record<string, string> = {
+  "primeira-surpresa": "scoop-1",
+  "brilho-em-dobro": "scoop-2",
+  "colecao-de-sonhos": "scoop-3",
+  "experiencia-premium": "scoop-4",
+};
+
 export const testimonials: Testimonial[] = [
   { name: "Ana Beatriz M.", text: "Comprei o Primeira Surpresa e foi a melhor experiência! Cada peça era mais linda que a outra. O vídeo da abertura é um charme extra.", rating: 5, location: "São Paulo, SP" },
   { name: "Camila R.", text: "O Brilho em Dobro superou minhas expectativas. 6 acessórios perfeitos, mix dourado e prata impecável. Já quero o próximo!", rating: 5, location: "Rio de Janeiro, RJ" },
@@ -81,7 +88,8 @@ export const faqItems: FaqItem[] = [
 ];
 
 export function getProductById(id: string): Product | undefined {
-  return products.find((p) => p.id === id);
+  const resolvedId = slugMap[id] || id;
+  return products.find((p) => p.id === resolvedId);
 }
 
 export function getRelatedProducts(id: string): Product[] {

@@ -54,6 +54,7 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              maxLength={255}
               placeholder="seu@email.com"
             />
           </div>
@@ -67,6 +68,7 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={8}
+              maxLength={128}
               placeholder="Minimo 8 caracteres"
             />
           </div>
@@ -80,6 +82,7 @@ export default function RegisterPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               minLength={8}
+              maxLength={128}
               placeholder="Confirme sua senha"
             />
           </div>

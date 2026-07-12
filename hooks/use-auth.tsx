@@ -25,6 +25,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const checkAuth = useCallback(async () => {
+    if (typeof window === "undefined") {
+      setIsLoading(false);
+      return;
+    }
     const token = localStorage.getItem("lisory_token");
     if (!token) {
       setIsLoading(false);

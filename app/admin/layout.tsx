@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
@@ -33,6 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/hooks/use-auth";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -52,6 +53,22 @@ export default function AdminLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, isLoading, isAdmin, logout } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && (!user || !isAdmin)) {
+      router.push("/login");
+    }
+  }, [user, isLoading, isAdmin, router]);
+
+  if (isLoading || !user || !isAdmin) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="size-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
 
   const breadcrumbs = (() => {
     const segments = pathname.split("/").filter(Boolean);
@@ -185,12 +202,12 @@ export default function AdminLayout({
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 px-2">
                   <Avatar className="size-8">
-                    <AvatarImage src="/images/admin-avatar.jpg" />
-                    <AvatarFallback>AD</AvatarFallback>
+                    <AvatarImage src="" />
+                    <AvatarFallback>{user.email.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="hidden text-left md:block">
-                    <p className="text-sm font-medium">Admin</p>
-                    <p className="text-xs text-muted-foreground">admin@lisory.com</p>
+                    <p className="text-sm font-medium">{user.email.split("@")[0]}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
                   </div>
                 </Button>
               </DropdownMenuTrigger>
@@ -206,7 +223,7 @@ export default function AdminLayout({
                   Configurações
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive">
+                <DropdownMenuItem className="text-destructive" onClick={() => { logout(); router.push("/"); }}>
                   <LogOut className="mr-2 size-4" />
                   Sair
                 </DropdownMenuItem>

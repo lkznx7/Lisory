@@ -19,6 +19,8 @@ import { useCart } from "@/hooks/use-cart";
 import { FREE_SHIPPING_THRESHOLD } from "@/constants";
 import { shippingService } from "@/services/shipping.service";
 import { ShippingOption } from "@/types";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 export function CartPageContent() {
   const { items, removeItem, updateQuantity, totalPrice } = useCart();
@@ -26,6 +28,9 @@ export function CartPageContent() {
   const [shippingCost, setShippingCost] = useState<number | null>(null);
   const [loadingShipping, setLoadingShipping] = useState(false);
   const [selectedShipping, setSelectedShipping] = useState<ShippingOption | null>(null);
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [loadingCoupon, setLoadingCoupon] = useState(false);
 
   const calculateFreight = async (code: string) => {
     if (!code || code.length !== 8) return;
@@ -57,8 +62,38 @@ export function CartPageContent() {
     }
   }, [zipCode]);
 
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setLoadingCoupon(true);
+    try {
+      const result = await api.post<{ discountType: string; discountValue: number; code: string }>(
+        "/coupons/validate",
+        { code: couponCode.trim(), orderValue: totalPrice }
+      );
+      let discount = 0;
+      if (result.discountType === "PERCENTAGE") {
+        discount = (totalPrice * result.discountValue) / 100;
+      } else {
+        discount = Math.min(result.discountValue, totalPrice);
+      }
+      setAppliedCoupon({ code: result.code, discount });
+      toast.success("Cupom aplicado com sucesso!");
+    } catch {
+      toast.error("Cupom invalido ou expirado");
+      setAppliedCoupon(null);
+    } finally {
+      setLoadingCoupon(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode("");
+  };
+
   const shipping = shippingCost !== null ? shippingCost : (totalPrice >= FREE_SHIPPING_THRESHOLD ? 0 : 19.9);
-  const total = totalPrice + shipping;
+  const discount = appliedCoupon?.discount || 0;
+  const total = totalPrice - discount + shipping;
 
   return (
     <main className="pt-[72px] sm:pt-[88px] lg:pt-[96px] min-h-screen bg-[#FFF9F8]">
@@ -147,6 +182,14 @@ export function CartPageContent() {
                       R${totalPrice.toFixed(2)}
                     </span>
                   </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[#3E8B5A]">Desconto</span>
+                      <span className="text-[#3E8B5A] font-medium">
+                        -R${discount.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-2 border border-[#F2DCDD] rounded-[10px] px-3 h-10">
                     <MapPin size={14} className="text-[#6E5A5D]" />
                     <input
@@ -180,18 +223,37 @@ export function CartPageContent() {
                     R${total.toFixed(2)}
                   </span>
                 </div>
-                <div className="flex gap-2 pt-2">
-                  <div className="flex-1 flex items-center gap-2 border border-[#F2DCDD] rounded-[10px] px-3 h-10">
-                    <Tag size={14} className="text-[#6E5A5D]" />
-                    <input
-                      placeholder="Cupom de desconto"
-                      className="flex-1 text-sm bg-transparent outline-none placeholder-[#6E5A5D]"
-                    />
+                {appliedCoupon ? (
+                  <div className="flex items-center justify-between bg-[#FCEEEF] rounded-[10px] px-3 h-10">
+                    <div className="flex items-center gap-2">
+                      <Tag size={14} className="text-[#3E8B5A]" />
+                      <span className="text-sm font-medium text-[#3E8B5A]">{appliedCoupon.code}</span>
+                      <span className="text-xs text-[#6E5A5D]">(-R${appliedCoupon.discount.toFixed(2)})</span>
+                    </div>
+                    <button onClick={removeCoupon} className="text-xs text-[#D64F4F] hover:underline">
+                      Remover
+                    </button>
                   </div>
-                  <button className="h-10 px-4 border border-[#F2DCDD] hover:border-[#D97D93] text-sm text-[#6E5A5D] hover:text-[#D97D93] rounded-[10px] transition-colors whitespace-nowrap">
-                    Aplicar
-                  </button>
-                </div>
+                ) : (
+                  <div className="flex gap-2 pt-2">
+                    <div className="flex-1 flex items-center gap-2 border border-[#F2DCDD] rounded-[10px] px-3 h-10">
+                      <Tag size={14} className="text-[#6E5A5D]" />
+                      <input
+                        placeholder="Cupom de desconto"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        className="flex-1 text-sm bg-transparent outline-none placeholder-[#6E5A5D]"
+                      />
+                    </div>
+                    <button
+                      onClick={applyCoupon}
+                      disabled={loadingCoupon || !couponCode.trim()}
+                      className="h-10 px-4 border border-[#F2DCDD] hover:border-[#D97D93] text-sm text-[#6E5A5D] hover:text-[#D97D93] rounded-[10px] transition-colors whitespace-nowrap disabled:opacity-50"
+                    >
+                      {loadingCoupon ? "..." : "Aplicar"}
+                    </button>
+                  </div>
+                )}
                 <Link
                   href="/checkout"
                   className="w-full h-12 bg-[#D97D93] hover:bg-[#C8667F] text-white text-sm font-semibold rounded-xl transition-colors flex items-center justify-center"

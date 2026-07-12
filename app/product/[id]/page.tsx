@@ -1,37 +1,65 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductDetailContent } from "./content";
-import { products as fallbackProducts } from "@/constants/data";
+import { products as fallbackProducts, getProductById } from "@/constants/data";
+import type { Product } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.lisory.com.br";
+
+interface ApiImage {
+  id: string;
+  imageUrl: string;
+  isPrimary: boolean;
+}
+
+interface ApiProductResponse {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  price: number;
+  promotionalPrice: number | null;
+  categoryName: string | null;
+  images: ApiImage[];
+  rating?: number;
+  reviews?: number;
+}
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
-async function getProduct(slug: string) {
+async function getProduct(slug: string): Promise<Product | ApiProductResponse | null> {
   try {
     const res = await fetch(`${API_URL}/products/${slug}`, {
       cache: "no-store",
     });
     if (!res.ok) {
-      const fallback = fallbackProducts.find((p) => p.id === slug || p.id === decodeURIComponent(slug));
-      return fallback || null;
+      return getProductById(slug) || null;
     }
     return res.json();
   } catch {
-    const fallback = fallbackProducts.find((p) => p.id === slug || p.id === decodeURIComponent(slug));
-    return fallback || null;
+    return getProductById(slug) || null;
   }
 }
 
-async function getRelatedProducts(productId: string) {
+async function getRelatedProducts(productId: string): Promise<Product[]> {
   try {
     const res = await fetch(`${API_URL}/products/${productId}/related?limit=4`, {
       cache: "no-store",
     });
     if (!res.ok) return [];
-    return res.json();
+    const data: ApiProductResponse[] = await res.json();
+    return data.map((p) => ({
+      id: p.slug || p.id,
+      name: p.name,
+      price: p.promotionalPrice || p.price,
+      originalPrice: p.promotionalPrice ? p.price : undefined,
+      image: p.images?.find((img) => img.isPrimary)?.imageUrl || p.images?.[0]?.imageUrl || "/images/scoop-1.jpg",
+      category: p.categoryName || "Scoop",
+      rating: p.rating || 4.9,
+      reviews: p.reviews || 150,
+    }));
   } catch {
     return [];
   }
@@ -42,13 +70,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = await getProduct(id);
   if (!product) return {};
 
+  const name = "name" in product ? product.name : "";
+  const description = "description" in product ? product.description : "";
+
   return {
-    title: product.name,
-    description: `${product.name} - ${product.description || "Scoop Lisory"}`,
+    title: name,
+    description: `${name} - ${description || "Scoop Lisory"}`,
     openGraph: {
-      title: `${product.name} | LISORY`,
-      description: product.description || `${product.name} - Scoop Lisory`,
-      images: product.images?.[0]?.imageUrl ? [{ url: product.images[0].imageUrl }] : [],
+      title: `${name} | LISORY`,
+      description: description || `${name} - Scoop Lisory`,
+      images: "images" in product && product.images?.[0]?.imageUrl ? [{ url: product.images[0].imageUrl }] : [],
     },
   };
 }
@@ -58,32 +89,27 @@ export default async function ProductPage({ params }: Props) {
   const apiProduct = await getProduct(id);
   if (!apiProduct) notFound();
 
-  const relatedApi = await getRelatedProducts(apiProduct.id);
+  const isApiProduct = "images" in apiProduct && Array.isArray(apiProduct.images);
 
-  const product = {
-    id: apiProduct.slug || apiProduct.id,
-    name: apiProduct.name,
-    price: apiProduct.price,
-    originalPrice: apiProduct.originalPrice,
-    image: apiProduct.image || apiProduct.images?.find((img: any) => img.isPrimary)?.imageUrl || "/images/placeholder.jpg",
-    category: apiProduct.category || apiProduct.categoryName || "Scoop",
-    rating: apiProduct.rating || 4.9,
-    reviews: apiProduct.reviews || 187,
-    description: apiProduct.description,
-  };
+  const product: Product = isApiProduct
+    ? {
+        id: apiProduct.slug || apiProduct.id,
+        name: apiProduct.name,
+        price: apiProduct.promotionalPrice || apiProduct.price,
+        originalPrice: apiProduct.promotionalPrice ? apiProduct.price : undefined,
+        image: apiProduct.images?.find((img) => img.isPrimary)?.imageUrl || apiProduct.images?.[0]?.imageUrl || "/images/scoop-1.jpg",
+        category: apiProduct.categoryName || "Scoop",
+        rating: apiProduct.rating || 4.9,
+        reviews: apiProduct.reviews || 187,
+        description: apiProduct.description,
+      }
+    : (apiProduct as Product);
+
+  const relatedApi = await getRelatedProducts(isApiProduct ? apiProduct.id : product.id);
 
   const relatedProducts = relatedApi.length > 0
-    ? relatedApi.map((p: any) => ({
-        id: p.slug || p.id,
-        name: p.name,
-        price: p.promotionalPrice || p.price,
-        originalPrice: p.promotionalPrice ? p.price : undefined,
-        image: p.images?.find((img: any) => img.isPrimary)?.imageUrl || p.images?.[0]?.imageUrl || "/images/placeholder.jpg",
-        category: p.categoryName || "Scoop",
-        rating: 4.9,
-        reviews: Math.floor(Math.random() * 200) + 50,
-      }))
+    ? relatedApi
     : fallbackProducts.filter((p) => p.id !== product.id).slice(0, 4);
 
-  return <ProductDetailContent product={product as any} relatedProducts={relatedProducts as any} />;
+  return <ProductDetailContent product={product} relatedProducts={relatedProducts} />;
 }
