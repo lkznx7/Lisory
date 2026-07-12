@@ -175,39 +175,27 @@ export function CheckoutPageContent() {
     setLoading(true);
     try {
       const orderPayload = {
-        customer: {
-          name: data.guestName,
-          email: data.guestEmail,
-          cpf: data.guestCpf.replace(/\D/g, ""),
-          phone: data.guestPhone,
-        },
-        address: {
-          street: data.street,
-          number: data.number,
-          complement: data.complement || null,
-          neighborhood: data.neighborhood,
-          city: data.city,
-          state: data.state,
-          zipCode: data.zipCode.replace(/\D/g, ""),
-        },
-        items: items.map((item) => ({
-          productId: item.id,
-          quantity: String(item.qty),
-          price: item.price,
-          description: item.name,
-        })),
-        shippingOption: {
-          carrier: selectedShipping?.carrier || null,
-          service: selectedShipping?.service || null,
-          cost: selectedShipping?.cost || 0,
-          estimatedDays: selectedShipping?.estimatedDays || null,
-        },
+        guestName: data.guestName,
+        guestEmail: data.guestEmail,
+        guestCpf: data.guestCpf.replace(/\D/g, ""),
+        guestPhone: data.guestPhone,
+        street: data.street,
+        number: data.number,
+        complement: data.complement || null,
+        neighborhood: data.neighborhood,
+        city: data.city,
+        state: data.state,
+        zipCode: data.zipCode.replace(/\D/g, ""),
+        paymentMethod: data.paymentMethod,
+        shippingCarrier: selectedShipping?.carrier || null,
+        shippingService: selectedShipping?.service || null,
+        shippingCost: selectedShipping?.cost || 0,
       };
 
       console.log("[CHECKOUT] Submitting order:", {
-        customer: orderPayload.customer.name,
-        items: orderPayload.items.length,
-        shippingCost: orderPayload.shippingOption.cost,
+        customer: orderPayload.guestName,
+        paymentMethod: orderPayload.paymentMethod,
+        shippingCost: orderPayload.shippingCost,
       });
       const result = await api.post<{ id: string; checkoutUrl?: string }>("/orders/public", orderPayload);
       console.log("[CHECKOUT] Order created:", { orderId: result.id, hasCheckoutUrl: !!result.checkoutUrl });
