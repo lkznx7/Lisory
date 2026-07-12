@@ -128,7 +128,7 @@ public class OrderFacade {
             return cartRepository.findByUserId(userId)
                     .orElseThrow(() -> new ResourceNotFoundException("Cart", "userId", userId));
         } else if (guestCartId != null) {
-            return cartRepository.findByGuestCartId(guestCartId)
+            return cartRepository.findByGuestCartIdWithItems(guestCartId)
                     .orElseThrow(() -> new ResourceNotFoundException("Cart", "guestCartId", guestCartId));
         }
         throw new BusinessException("Cart identifier is required");
