@@ -79,9 +79,7 @@ public class InfinitePayService {
                 properties.redirectUrl(),
                 properties.webhookUrl(),
                 orderId.toString(),
-                items,
-                buildCustomerInfo(order),
-                null
+                items
         );
 
         InfinitePayCreateLinkResponse response = client.createPaymentLink(request);
@@ -143,17 +141,6 @@ public class InfinitePayService {
                     "newStatus", OrderStatus.PAGO.name()
             ));
         }
-    }
-
-    private InfinitePayCreateLinkRequest.CustomerInfo buildCustomerInfo(Order order) {
-        if (order.getGuestName() == null && order.getGuestEmail() == null) {
-            return null;
-        }
-        return new InfinitePayCreateLinkRequest.CustomerInfo(
-                order.getGuestName(),
-                order.getGuestEmail(),
-                order.getGuestPhone()
-        );
     }
 
     private void savePaymentRecord(UUID orderId, String paymentLink) {

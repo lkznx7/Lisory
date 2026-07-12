@@ -50,9 +50,7 @@ public class InfinitePayPaymentProvider implements PaymentProvider {
                     properties.redirectUrl(),
                     properties.webhookUrl(),
                     request.orderId() != null ? request.orderId().toString() : null,
-                    items,
-                    null,
-                    null
+                    items
             );
 
             InfinitePayCreateLinkResponse response = client.createPaymentLink(linkRequest);

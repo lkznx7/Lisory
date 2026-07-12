@@ -11,7 +11,6 @@ import com.lisory.backend.envios.services.ShippingQuote;
 import com.lisory.backend.exception.BusinessException;
 import com.lisory.backend.exception.ResourceNotFoundException;
 import com.lisory.backend.cupons.entity.Coupon;
-import com.lisory.backend.pagamentos.dto.PaymentResponse;
 import com.lisory.backend.pagamentos.services.PaymentService;
 import com.lisory.backend.pedido.dto.OrderRequest;
 import com.lisory.backend.pedido.dto.OrderResponse;
@@ -28,8 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.math.BigDecimal;
 import java.util.LinkedHashSet;
@@ -104,32 +101,13 @@ public class OrderFacade {
 
         cartItemRepository.deleteByCartId(cart.getId());
 
-        OrderResponse response = responseMapper.toResponse(savedOrder);
-
-        UUID orderId = savedOrder.getId();
-        String paymentMethod = request.paymentMethod();
-        BigDecimal total = savedOrder.getTotal();
-
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCommit() {
-                    try {
-                        paymentService.initiatePayment(orderId, paymentMethod, total);
-                    } catch (Exception e) {
-                        log.error("payment_initiation_failed_after_commit", e);
-                    }
-                }
-            });
-        } else {
-            try {
-                paymentService.initiatePayment(orderId, paymentMethod, total);
-            } catch (Exception e) {
-                log.error("payment_initiation_failed", e);
-            }
+        try {
+            paymentService.initiatePayment(savedOrder.getId(), request.paymentMethod(), savedOrder.getTotal());
+        } catch (Exception e) {
+            log.error("payment_initiation_failed_for_order_{}", savedOrder.getId(), e);
         }
 
-        return response;
+        return responseMapper.toResponse(savedOrder);
     }
 
     public OrderResponse confirmPayment(UUID orderId) {
