@@ -197,17 +197,17 @@ export function CheckoutPageContent() {
         paymentMethod: orderPayload.paymentMethod,
         shippingCost: orderPayload.shippingCost,
       });
-      const result = await api.post<{ id: string; checkoutUrl?: string }>("/orders/public", orderPayload);
-      console.log("[CHECKOUT] Order created:", { orderId: result.id, hasCheckoutUrl: !!result.checkoutUrl });
+      const result = await api.post<{ id: string; paymentLink?: string }>("/orders/public", orderPayload);
+      console.log("[CHECKOUT] Order created:", { orderId: result.id, hasPaymentLink: !!result.paymentLink });
 
       await clearCart();
       toast.success("Pedido realizado com sucesso!");
 
-      if (result.checkoutUrl) {
-        console.log("[CHECKOUT] Redirecting to InfinitePay:", result.checkoutUrl.substring(0, 60) + "...");
-        window.location.href = result.checkoutUrl;
+      if (result.paymentLink) {
+        console.log("[CHECKOUT] Redirecting to InfinitePay:", result.paymentLink.substring(0, 60) + "...");
+        window.location.href = result.paymentLink;
       } else {
-        console.log("[CHECKOUT] No checkoutUrl, redirecting to confirmation");
+        console.log("[CHECKOUT] No paymentLink, redirecting to confirmation");
         router.push(`/confirmation?orderId=${result.id}`);
       }
     } catch (err) {

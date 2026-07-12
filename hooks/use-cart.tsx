@@ -87,7 +87,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       });
 
       try {
-        await api.post<ApiCartResponse>("/cart/items", { productSlug: productId, quantity: qty });
+        await api.post<ApiCartResponse>("/cart/items", { productId: productId, quantity: qty });
         await refreshCart();
       } catch (e) {
         console.error("Failed to add to cart:", e);
