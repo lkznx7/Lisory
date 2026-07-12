@@ -44,8 +44,7 @@ public class CartController {
             @Valid @RequestBody CartUpdateRequest request,
             @RequestHeader(value = "X-Guest-Cart-Id", required = false) UUID guestCartId) {
         UUID userId = getCurrentUserId();
-        CartResponse cart = cartService.getCart(userId, guestCartId);
-        return ResponseEntity.ok(cartService.updateItemQuantity(cart.id(), itemId, request));
+        return ResponseEntity.ok(cartService.updateItemQuantity(userId, guestCartId, itemId, request));
     }
 
     @DeleteMapping("/items/{itemId}")
@@ -53,8 +52,7 @@ public class CartController {
             @PathVariable UUID itemId,
             @RequestHeader(value = "X-Guest-Cart-Id", required = false) UUID guestCartId) {
         UUID userId = getCurrentUserId();
-        CartResponse cart = cartService.getCart(userId, guestCartId);
-        cartService.removeItem(cart.id(), itemId);
+        cartService.removeItem(userId, guestCartId, itemId);
         return ResponseEntity.noContent().build();
     }
 
@@ -62,8 +60,7 @@ public class CartController {
     public ResponseEntity<Void> clearCart(
             @RequestHeader(value = "X-Guest-Cart-Id", required = false) UUID guestCartId) {
         UUID userId = getCurrentUserId();
-        CartResponse cart = cartService.getCart(userId, guestCartId);
-        cartService.clearCart(cart.id());
+        cartService.clearCart(userId, guestCartId);
         return ResponseEntity.noContent().build();
     }
 

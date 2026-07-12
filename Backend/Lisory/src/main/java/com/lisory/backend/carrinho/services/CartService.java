@@ -9,10 +9,13 @@ import com.lisory.backend.carrinho.entity.Cart;
 import com.lisory.backend.carrinho.entity.CartItem;
 import com.lisory.backend.carrinho.repository.CartItemRepository;
 import com.lisory.backend.carrinho.repository.CartRepository;
+import com.lisory.backend.exception.BusinessException;
 import com.lisory.backend.exception.ResourceNotFoundException;
 import com.lisory.backend.produtos.entity.Product;
 import com.lisory.backend.produtos.entity.ProductImage;
 import com.lisory.backend.produtos.repository.ProductRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +30,9 @@ public class CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public CartService(CartRepository cartRepository,
                        CartItemRepository cartItemRepository,
@@ -58,7 +64,7 @@ public class CartService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", request.productId()));
 
         if (product.getStockQuantity() <= 0) {
-            throw new IllegalStateException("Product is out of stock");
+            throw new BusinessException("Product is out of stock");
         }
 
         Optional<CartItem> existingItem = cart.getItems().stream()
@@ -67,7 +73,12 @@ public class CartService {
 
         if (existingItem.isPresent()) {
             CartItem item = existingItem.get();
-            item.setQuantity(item.getQuantity() + (request.quantity() != null ? request.quantity() : 1));
+            int addQty = request.quantity() != null ? request.quantity() : 1;
+            int newQty = item.getQuantity() + addQty;
+            if (newQty > product.getStockQuantity()) {
+                throw new BusinessException("Requested quantity exceeds available stock (" + product.getStockQuantity() + ")");
+            }
+            item.setQuantity(newQty);
             cartItemRepository.save(item);
         } else {
             CartItem item = new CartItem();
@@ -82,11 +93,13 @@ public class CartService {
     }
 
     @Transactional
-    public CartResponse updateItemQuantity(UUID cartId, UUID itemId, CartUpdateRequest request) {
+    public CartResponse updateItemQuantity(UUID userId, UUID guestCartId, UUID itemId, CartUpdateRequest request) {
+        Cart cart = findOrCreateCart(userId, guestCartId);
+
         CartItem item = cartItemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("CartItem", "id", itemId));
 
-        if (!item.getCart().getId().equals(cartId)) {
+        if (!item.getCart().getId().equals(cart.getId())) {
             throw new ResourceNotFoundException("CartItem", "id", itemId);
         }
 
@@ -97,32 +110,29 @@ public class CartService {
             cartItemRepository.save(item);
         }
 
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart", "id", cartId));
-
         return toResponse(cart);
     }
 
     @Transactional
-    public CartResponse removeItem(UUID cartId, UUID itemId) {
+    public CartResponse removeItem(UUID userId, UUID guestCartId, UUID itemId) {
+        Cart cart = findOrCreateCart(userId, guestCartId);
+
         CartItem item = cartItemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("CartItem", "id", itemId));
 
-        if (!item.getCart().getId().equals(cartId)) {
+        if (!item.getCart().getId().equals(cart.getId())) {
             throw new ResourceNotFoundException("CartItem", "id", itemId);
         }
 
         cartItemRepository.delete(item);
 
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart", "id", cartId));
-
         return toResponse(cart);
     }
 
     @Transactional
-    public void clearCart(UUID cartId) {
-        cartItemRepository.deleteByCartId(cartId);
+    public void clearCart(UUID userId, UUID guestCartId) {
+        Cart cart = findOrCreateCart(userId, guestCartId);
+        cartItemRepository.deleteByCartId(cart.getId());
     }
 
     private Cart findOrCreateCart(UUID userId, UUID guestCartId) {
@@ -130,9 +140,7 @@ public class CartService {
             return cartRepository.findByUserId(userId)
                     .orElseGet(() -> {
                         Cart cart = new Cart();
-                        AuthEntity user = new AuthEntity();
-                        user.setId(userId);
-                        cart.setUser(user);
+                        cart.setUser(entityManager.getReference(AuthEntity.class, userId));
                         return cartRepository.save(cart);
                     });
         }
@@ -161,14 +169,17 @@ public class CartService {
                             .map(ProductImage::getImageUrl)
                             .orElse(null);
 
-                    BigDecimal total = product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+                    BigDecimal unitPrice = product.getPromotionalPrice() != null
+                            ? product.getPromotionalPrice()
+                            : product.getPrice();
+                    BigDecimal total = unitPrice.multiply(BigDecimal.valueOf(item.getQuantity()));
 
                     return new CartItemResponse(
                             item.getId(),
                             product.getId(),
                             product.getName(),
                             primaryImage,
-                            product.getPrice(),
+                            unitPrice,
                             item.getQuantity(),
                             total
                     );
