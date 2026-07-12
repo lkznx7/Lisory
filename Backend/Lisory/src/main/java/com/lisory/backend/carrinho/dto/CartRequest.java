@@ -1,11 +1,9 @@
 package com.lisory.backend.carrinho.dto;
 
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-
-import java.util.UUID;
+import jakarta.validation.constraints.NotBlank;
 
 public record CartRequest(
-        @NotNull UUID productId,
+        @NotBlank String productId,
         @Min(1) Integer quantity
 ) {}

@@ -60,15 +60,15 @@ public class CartService {
     public CartResponse addItem(UUID userId, UUID guestCartId, CartRequest request) {
         Cart cart = findOrCreateCart(userId, guestCartId);
 
-        Product product = productRepository.findById(request.productId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", request.productId()));
+        Product product = productRepository.findBySlug(request.productId())
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "slug", request.productId()));
 
         if (product.getStockQuantity() <= 0) {
             throw new BusinessException("Product is out of stock");
         }
 
         Optional<CartItem> existingItem = cart.getItems().stream()
-                .filter(item -> item.getProduct().getId().equals(request.productId()))
+                .filter(item -> item.getProduct().getSlug().equals(request.productId()))
                 .findFirst();
 
         if (existingItem.isPresent()) {
