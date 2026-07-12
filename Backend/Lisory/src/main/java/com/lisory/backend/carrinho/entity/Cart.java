@@ -2,8 +2,6 @@ package com.lisory.backend.carrinho.entity;
 
 import com.lisory.backend.auth.entity.AuthEntity;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -24,7 +22,6 @@ public class Cart {
     private UUID guestCartId;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @Fetch(FetchMode.SUBSELECT)
     private Set<CartItem> items = new LinkedHashSet<>();
 
     @Column(name = "created_at", nullable = false, updatable = false)
