@@ -6,8 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record InfinitePayProperties(
     String handle,
     String checkoutApiUrl,
-    String webhookSecret,
     String redirectUrl,
-    String webhookUrl,
-    String clientId
+    String webhookUrl
 ) {}

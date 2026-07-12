@@ -115,7 +115,6 @@ public class InfinitePayClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(java.util.List.of(MediaType.APPLICATION_JSON));
-        headers.set("x-client-id", properties.clientId());
         return headers;
     }
 }

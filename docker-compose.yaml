@@ -50,13 +50,11 @@ services:
       MELHOR_ENVIO_USER_AGENT: "Lisory (contato@lisory.com.br)"
       MELHOR_ENVIO_CALLBACK_URL: ${MELHOR_ENVIO_CALLBACK_URL:-https://lisory.com.br/api/integrations/melhor-envio/oauth/callback}
       MELHOR_ENVIO_SCOPES: ${MELHOR_ENVIO_SCOPES:-cart-read cart-write orders-read shipping-calculate shipping-cancel shipping-checkout shipping-companies shipping-generate shipping-preview shipping-print shipping-share shipping-tracking}
-      # InfinitePay
+      # InfinitePay (no auth — only handle needed)
       INFINITEPAY_HANDLE: ${INFINITEPAY_HANDLE:-}
       INFINITEPAY_CHECKOUT_API_URL: ${INFINITEPAY_CHECKOUT_API_URL:-https://api.checkout.infinitepay.io}
-      INFINITEPAY_WEBHOOK_SECRET: ${INFINITEPAY_WEBHOOK_SECRET:-}
       INFINITEPAY_REDIRECT_URL: ${INFINITEPAY_REDIRECT_URL:-https://lisory.com.br/checkout/success}
       INFINITEPAY_WEBHOOK_URL: ${INFINITEPAY_WEBHOOK_URL:-https://lisory.com.br/webhooks/infinitepay}
-      INFINITEPAY_CLIENT_ID: ${INFINITEPAY_CLIENT_ID:-}
 
   # ============================
   # Frontend — Next.js
