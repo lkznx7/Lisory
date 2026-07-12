@@ -8,6 +8,7 @@ import com.lisory.backend.pedido.entity.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -28,6 +29,7 @@ public class PaymentService {
         this.paymentProvider = paymentProvider;
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public PaymentResponse initiatePayment(UUID orderId, String paymentMethod, BigDecimal amount) {
         log.info("Initiating payment for order {} with method {} and amount {}", orderId, paymentMethod, amount);
 
@@ -60,6 +62,7 @@ public class PaymentService {
         return toDto(saved);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public GatewayResponse processOrderPayment(UUID orderId, String paymentMethod, BigDecimal amount) {
         Payment payment = paymentRepository.findByOrderId(orderId).orElse(null);
 
