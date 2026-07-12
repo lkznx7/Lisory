@@ -73,6 +73,9 @@ public class OrderFacade {
     public OrderResponse checkout(UUID userId, UUID guestCartId, OrderRequest request) {
         Cart cart = findCart(userId, guestCartId);
 
+        log.info("checkout_cart_found userId={} guestCartId={} cartId={} itemCount={}",
+                userId, guestCartId, cart.getId(), cart.getItems().size());
+
         if (cart.getItems().isEmpty()) {
             throw new BusinessException("Cart is empty");
         }
@@ -123,15 +126,22 @@ public class OrderFacade {
         return responseMapper.toResponse(savedOrder);
     }
 
-    private Cart findCart(UUID userId, UUID guestCartId) {
+    public Cart findCart(UUID userId, UUID guestCartId) {
+        Cart cart;
         if (userId != null) {
-            return cartRepository.findByUserId(userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Cart", "userId", userId));
-        } else if (guestCartId != null) {
-            return cartRepository.findByGuestCartIdWithItems(guestCartId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Cart", "guestCartId", guestCartId));
+            cart = cartRepository.findByUserId(userId)
+                    .orElse(null);
+            if (cart != null) return cart;
         }
-        throw new BusinessException("Cart identifier is required");
+        if (guestCartId != null) {
+            cart = cartRepository.findByGuestCartId(guestCartId)
+                    .orElse(null);
+            if (cart != null) {
+                cart.getItems().size();
+                return cart;
+            }
+        }
+        throw new BusinessException("Cart not found");
     }
 
     private Address resolveAddress(UUID addressId) {

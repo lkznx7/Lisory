@@ -94,13 +94,17 @@ public class OrderService {
         Cart cart;
         if (userId != null) {
             cart = cartRepository.findByUserId(userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Cart", "userId", userId));
+                    .orElse(null);
         } else if (guestCartId != null) {
             cart = cartRepository.findByGuestCartId(guestCartId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Cart", "guestCartId", guestCartId));
+                    .orElse(null);
         } else {
             throw new BusinessException("Cart identifier is required: provide userId or guestCartId");
         }
+        if (cart == null) {
+            throw new ResourceNotFoundException("Cart", "id", userId != null ? userId : guestCartId);
+        }
+        cart.getItems().size();
 
         if (cart.getItems().isEmpty()) {
             throw new BusinessException("Cart is empty");
