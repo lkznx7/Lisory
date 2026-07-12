@@ -40,7 +40,7 @@ interface PaginatedResponse<T> {
 
 function mapStatus(backendStatus: string): AdminOrder["status"] {
   const map: Record<string, AdminOrder["status"]> = {
-    AGUARDANDO_PAGAMENTO: "pending",
+    PENDING_PAYMENT: "pending",
     PAGO: "confirmed",
     PROCESSANDO: "processing",
     ENVIADO: "shipped",
@@ -168,7 +168,7 @@ export const OrderService = {
 
   async updateStatus(id: string, status: AdminOrder["status"]): Promise<AdminOrder | undefined> {
     const statusMap: Record<string, string> = {
-      pending: "AGUARDANDO_PAGAMENTO",
+      pending: "PENDING_PAYMENT",
       confirmed: "PAGO",
       processing: "PROCESSANDO",
       shipped: "ENVIADO",

@@ -187,16 +187,16 @@ export function CheckoutPageContent() {
         shippingCost: selectedShipping?.cost || 0,
       };
 
-      const result = await api.post<{ id: string; paymentLink?: string }>("/orders/public", orderPayload);
+      const result = await api.post<{ id: string; paymentId?: string; paymentStatus?: string; invoiceUrl?: string }>("/orders/public", orderPayload);
 
-      if (!result.paymentLink) {
+      if (!result.invoiceUrl) {
         toast.error("Erro ao gerar link de pagamento. Tente novamente.");
         setLoading(false);
         return;
       }
 
       await clearCart();
-      window.location.href = result.paymentLink;
+      window.location.href = result.invoiceUrl;
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro ao finalizar pedido");
     } finally {

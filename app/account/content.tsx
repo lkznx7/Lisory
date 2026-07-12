@@ -34,7 +34,7 @@ interface UserOrder {
 }
 
 const statusLabels: Record<string, { label: string; color: string }> = {
-  AGUARDANDO_PAGAMENTO: { label: "Aguardando Pagamento", color: "bg-amber-100 text-amber-700" },
+  PENDING_PAYMENT: { label: "Aguardando Pagamento", color: "bg-amber-100 text-amber-700" },
   PAGO: { label: "Pago", color: "bg-blue-100 text-blue-700" },
   PROCESSANDO: { label: "Processando", color: "bg-purple-100 text-purple-700" },
   ENVIADO: { label: "Enviado", color: "bg-indigo-100 text-indigo-700" },

@@ -18,7 +18,7 @@ interface OrderData {
 
 const STATUS_LABELS: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
   PAGO: { label: "Pagamento Confirmado", icon: <Check size={36} className="text-white" strokeWidth={2.5} />, color: "#3E8B5A" },
-  AGUARDANDO_PAGAMENTO: { label: "Aguardando Pagamento", icon: <Clock size={36} className="text-white" strokeWidth={2.5} />, color: "#D4A843" },
+  PENDING_PAYMENT: { label: "Aguardando Pagamento", icon: <Clock size={36} className="text-white" strokeWidth={2.5} />, color: "#D4A843" },
   PROCESSANDO: { label: "Processando", icon: <Clock size={36} className="text-white" strokeWidth={2.5} />, color: "#4A90D9" },
   CANCELADO: { label: "Cancelado", icon: <AlertCircle size={36} className="text-white" strokeWidth={2.5} />, color: "#C0392B" },
 };
@@ -43,7 +43,7 @@ export function ConfirmationPageContent() {
       .finally(() => setLoading(false));
   }, [orderId]);
 
-  const statusInfo = order ? STATUS_LABELS[order.status] || STATUS_LABELS.AGUARDANDO_PAGAMENTO : null;
+  const statusInfo = order ? STATUS_LABELS[order.status] || STATUS_LABELS.PENDING_PAYMENT : null;
   const isPaid = order?.status === "PAGO";
 
   return (
