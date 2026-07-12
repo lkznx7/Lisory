@@ -49,6 +49,9 @@ public class PaymentService {
         if (gatewayResponse.paymentUrl() != null) {
             saved.setPaymentLink(gatewayResponse.paymentUrl());
         }
+        if (gatewayResponse.slug() != null) {
+            saved.setOrderNSU(gatewayResponse.slug());
+        }
         saved = paymentRepository.save(saved);
 
         log.info("Payment initiated for order {}: status={}, hasPaymentLink={}",
@@ -83,6 +86,9 @@ public class PaymentService {
         payment.setStatus(gatewayResponse.status());
         if (gatewayResponse.paymentUrl() != null) {
             payment.setPaymentLink(gatewayResponse.paymentUrl());
+        }
+        if (gatewayResponse.slug() != null) {
+            payment.setOrderNSU(gatewayResponse.slug());
         }
         if ("APPROVED".equals(gatewayResponse.status()) || "PAID".equals(gatewayResponse.status())) {
             payment.setPaidAt(LocalDateTime.now());

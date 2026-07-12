@@ -72,7 +72,8 @@ class InfinitePayWebhookServiceTest {
                 "pix",
                 "txn-uuid-123",
                 orderId.toString(),
-                "https://comprovante.com/123"
+                "https://comprovante.com/123",
+                null
         );
 
         webhookService.processEvent(event);
@@ -81,7 +82,7 @@ class InfinitePayWebhookServiceTest {
         assertEquals("APPROVED", payment.getStatus());
         assertNotNull(payment.getPaidAt());
         assertEquals("txn-uuid-123", payment.getTransactionNSU());
-        assertEquals("abc123", payment.getOrderNSU());
+        assertEquals("abc123", payment.getGatewayId());
         assertEquals("pix", payment.getPaymentMethod());
         assertEquals(OrderStatus.PAGO.name(), orderEntity.getStatus());
     }
@@ -99,7 +100,7 @@ class InfinitePayWebhookServiceTest {
         when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(payment));
 
         InfinitePayWebhookEvent event = new InfinitePayWebhookEvent(
-                "abc123", 1500L, 1510L, 1, "pix", "txn-123", orderId.toString(), null
+                "abc123", 1500L, 1510L, 1, "pix", "txn-123", orderId.toString(), null, null
         );
 
         webhookService.processEvent(event);
@@ -111,7 +112,7 @@ class InfinitePayWebhookServiceTest {
     @DisplayName("should handle missing order_nsu")
     void shouldHandleMissingOrderNsu() {
         InfinitePayWebhookEvent event = new InfinitePayWebhookEvent(
-                "abc123", 1500L, 1510L, 1, "pix", "txn-123", null, null
+                "abc123", 1500L, 1510L, 1, "pix", "txn-123", null, null, null
         );
 
         webhookService.processEvent(event);
@@ -125,7 +126,7 @@ class InfinitePayWebhookServiceTest {
         when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.empty());
 
         InfinitePayWebhookEvent event = new InfinitePayWebhookEvent(
-                "abc123", 1500L, 1510L, 1, "pix", "txn-123", orderId.toString(), null
+                "abc123", 1500L, 1510L, 1, "pix", "txn-123", orderId.toString(), null, null
         );
 
         webhookService.processEvent(event);

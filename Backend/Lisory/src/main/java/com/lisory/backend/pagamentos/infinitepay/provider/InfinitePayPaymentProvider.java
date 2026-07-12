@@ -50,21 +50,27 @@ public class InfinitePayPaymentProvider implements PaymentProvider {
                     properties.redirectUrl(),
                     properties.webhookUrl(),
                     request.orderId() != null ? request.orderId().toString() : null,
-                    items
+                    items,
+                    null,
+                    null
             );
 
             InfinitePayCreateLinkResponse response = client.createPaymentLink(linkRequest);
 
+            String effectiveUrl = response.getEffectiveUrl();
+
             log.info("infinitepay_provider_link_created", Map.of(
                     "orderId", request.orderId() != null ? request.orderId().toString() : "null",
-                    "urlPresent", response.url() != null ? "true" : "false"
+                    "urlPresent", effectiveUrl != null ? "true" : "false",
+                    "slugPresent", response.slug() != null ? "true" : "false"
             ));
 
             return new GatewayResponse(
                     request.orderId() != null ? request.orderId().toString() : null,
                     request.orderId() != null ? request.orderId().toString() : null,
                     "PENDING",
-                    response.url()
+                    effectiveUrl,
+                    response.slug()
             );
         } catch (InfinitePayException e) {
             log.error("infinitepay_provider_payment_error", Map.of(

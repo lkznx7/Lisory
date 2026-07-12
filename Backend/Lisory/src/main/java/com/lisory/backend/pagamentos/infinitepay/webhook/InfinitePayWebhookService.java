@@ -74,13 +74,12 @@ public class InfinitePayWebhookService {
 
         payment.setStatus(STATUS_APPROVED);
         payment.setPaidAt(LocalDateTime.now());
-        payment.setGatewayId(event.invoiceSlug());
 
+        if (event.invoiceSlug() != null) {
+            payment.setGatewayId(event.invoiceSlug());
+        }
         if (event.transactionNsu() != null) {
             payment.setTransactionNSU(event.transactionNsu());
-        }
-        if (event.invoiceSlug() != null) {
-            payment.setOrderNSU(event.invoiceSlug());
         }
         if (event.captureMethod() != null) {
             payment.setPaymentMethod(event.captureMethod());

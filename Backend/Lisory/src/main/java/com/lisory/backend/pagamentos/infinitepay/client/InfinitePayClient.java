@@ -46,7 +46,8 @@ public class InfinitePayClient {
             }
 
             log.info("infinitepay_create_link_success", Map.of(
-                    "url", body.url() != null ? "present" : "null"
+                    "url", body.getEffectiveUrl() != null ? "present" : "null",
+                    "slug", body.slug() != null ? "present" : "null"
             ));
 
             return body;

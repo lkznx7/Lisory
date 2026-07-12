@@ -79,23 +79,27 @@ public class InfinitePayService {
                 properties.redirectUrl(),
                 properties.webhookUrl(),
                 orderId.toString(),
-                items
+                items,
+                null,
+                null
         );
 
         InfinitePayCreateLinkResponse response = client.createPaymentLink(request);
 
-        if (response.url() == null || response.url().isBlank()) {
+        String effectiveUrl = response.getEffectiveUrl();
+        if (effectiveUrl == null || effectiveUrl.isBlank()) {
             throw new InfinitePayException("Empty payment URL from InfinitePay", "EMPTY_URL");
         }
 
-        savePaymentRecord(orderId, response.url());
+        savePaymentRecord(orderId, effectiveUrl, response.slug());
 
         log.info("infinitepay_create_link_success", Map.of(
                 "orderId", orderId.toString(),
-                "url", "present"
+                "url", "present",
+                "slug", response.slug() != null ? "present" : "null"
         ));
 
-        return response.url();
+        return effectiveUrl;
     }
 
     public InfinitePayPaymentCheckResponse checkPaymentStatus(UUID orderId) {
@@ -143,7 +147,7 @@ public class InfinitePayService {
         }
     }
 
-    private void savePaymentRecord(UUID orderId, String paymentLink) {
+    private void savePaymentRecord(UUID orderId, String paymentLink, String slug) {
         Payment payment = paymentRepository.findByOrderId(orderId).orElse(null);
         if (payment == null) {
             payment = new Payment();
@@ -158,6 +162,9 @@ public class InfinitePayService {
         payment.setStatus("PENDING");
         payment.setPaymentLink(paymentLink);
         payment.setOrderNSU(orderId.toString());
+        if (slug != null) {
+            payment.setGatewayId(slug);
+        }
         paymentRepository.save(payment);
     }
 }
