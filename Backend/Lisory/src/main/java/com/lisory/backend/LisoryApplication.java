@@ -1,8 +1,8 @@
 package com.lisory.backend;
 
+import com.lisory.backend.config.properties.AsaasProperties;
 import com.lisory.backend.config.properties.CorsProperties;
 import com.lisory.backend.config.properties.DatabaseProperties;
-import com.lisory.backend.config.properties.InfinitePayProperties;
 import com.lisory.backend.config.properties.JwtProperties;
 import com.lisory.backend.config.properties.MelhorEnvioProperties;
 import com.lisory.backend.config.security.RateLimitProperties;
@@ -17,7 +17,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
     JwtProperties.class,
     DatabaseProperties.class,
     MelhorEnvioProperties.class,
-    InfinitePayProperties.class,
+    AsaasProperties.class,
     CorsProperties.class,
     RateLimitProperties.class
 })

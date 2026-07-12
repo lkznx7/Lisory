@@ -4,7 +4,6 @@ import com.lisory.backend.envios.melhorenvio.exception.MelhorEnvioException;
 import com.lisory.backend.exception.BusinessException;
 import com.lisory.backend.exception.InvalidOperationException;
 import com.lisory.backend.exception.ResourceNotFoundException;
-import com.lisory.backend.pagamentos.infinitepay.exception.InfinitePayException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,7 +21,7 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler({EmailAlreadyExistsException.class, InvalidCredentialsException.class, BusinessException.class, InvalidOperationException.class, InfinitePayException.class, MelhorEnvioException.class})
+    @ExceptionHandler({EmailAlreadyExistsException.class, InvalidCredentialsException.class, BusinessException.class, InvalidOperationException.class, MelhorEnvioException.class})
     public ResponseEntity<?> handleBusinessException(RuntimeException e) {
         return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     }

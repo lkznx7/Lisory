@@ -54,7 +54,7 @@ class PaymentServiceTest {
 
         GatewayResponse gatewayResponse = new GatewayResponse(
                 orderId.toString(), orderId.toString(), "PENDING",
-                "https://checkout.infinitepay.com.br/test?lenc=abc123");
+                "https://pay.asaas.com/test?invoice=abc123");
         when(paymentProvider.processPayment(any())).thenReturn(gatewayResponse);
 
         PaymentResponse response = paymentService.initiatePayment(orderId, "PIX", new BigDecimal("149.00"));
@@ -64,7 +64,7 @@ class PaymentServiceTest {
         assertEquals("PIX", response.paymentMethod());
         assertEquals(new BigDecimal("149.00"), response.amount());
         assertNotNull(response.paymentLink());
-        assertTrue(response.paymentLink().contains("infinitepay"));
+        assertTrue(response.paymentLink().contains("asaas"));
         verify(paymentRepository, times(2)).save(any(Payment.class));
         verify(paymentProvider, times(1)).processPayment(any());
     }
@@ -120,7 +120,7 @@ class PaymentServiceTest {
         payment.setTransactionId("tx-012");
         payment.setPaidAt(LocalDateTime.now());
         payment.setInstallments(3);
-        payment.setPaymentLink("https://checkout.infinitepay.com.br/test?lenc=xyz");
+        payment.setPaymentLink("https://pay.asaas.com/test?invoice=xyz");
 
         when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(payment));
 

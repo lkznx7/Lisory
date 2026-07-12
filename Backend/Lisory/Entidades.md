@@ -389,7 +389,7 @@ O preço unitário é armazenado para preservar o histórico caso o produto tenh
 
 Armazena todas as informações relacionadas ao pagamento do pedido.
 
-Integra-se à InfinitePay.
+Integra-se ao Asaas.
 
 Permite armazenar:
 
@@ -406,7 +406,7 @@ Permite armazenar:
 |--------|------|
 | id | Integer |
 | order_id | FK |
-| infinite_pay_id | VARCHAR(255) |
+| asaas_payment_id | VARCHAR(255) |
 | transaction_id | VARCHAR(255) |
 | payment_method | VARCHAR(50) |
 | amount | DECIMAL(10,2) |

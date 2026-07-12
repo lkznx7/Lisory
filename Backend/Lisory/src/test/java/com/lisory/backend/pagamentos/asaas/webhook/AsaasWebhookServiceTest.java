@@ -1,15 +1,14 @@
-package com.lisory.backend.pagamentos.infinitepay.webhook;
+package com.lisory.backend.pagamentos.asaas.webhook;
 
-import com.lisory.backend.envios.services.ShipmentService;
+import com.lisory.backend.pagamentos.asaas.dto.AsaasWebhookEvent;
 import com.lisory.backend.pagamentos.entity.Payment;
-import com.lisory.backend.pagamentos.infinitepay.dto.InfinitePayWebhookEvent;
 import com.lisory.backend.pagamentos.repository.PaymentRepository;
 import com.lisory.backend.pedido.entity.Order;
 import com.lisory.backend.pedido.entity.OrderStatus;
 import com.lisory.backend.pedido.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,8 +22,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("InfinitePayWebhookService Tests")
-class InfinitePayWebhookServiceTest {
+@DisplayName("AsaasWebhookService Tests")
+class AsaasWebhookServiceTest {
 
     @Mock
     private PaymentRepository paymentRepository;
@@ -32,11 +31,8 @@ class InfinitePayWebhookServiceTest {
     @Mock
     private OrderRepository orderRepository;
 
-    @Mock
-    private ShipmentService shipmentService;
-
     @InjectMocks
-    private InfinitePayWebhookService webhookService;
+    private AsaasWebhookService webhookService;
 
     private UUID orderId;
 
@@ -46,8 +42,8 @@ class InfinitePayWebhookServiceTest {
     }
 
     @Test
-    @DisplayName("should process payment webhook and approve payment")
-    void shouldProcessPaymentWebhook() {
+    @DisplayName("should process PAYMENT_RECEIVED webhook and approve payment")
+    void shouldProcessPaymentReceived() {
         Payment payment = new Payment();
         payment.setId(UUID.randomUUID());
         Order order = new Order();
@@ -64,16 +60,13 @@ class InfinitePayWebhookServiceTest {
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(orderEntity));
         when(orderRepository.save(any(Order.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        InfinitePayWebhookEvent event = new InfinitePayWebhookEvent(
-                "abc123",
-                1500L,
-                1510L,
-                1,
-                "pix",
-                "txn-uuid-123",
-                orderId.toString(),
-                "https://comprovante.com/123",
-                null
+        AsaasWebhookEvent event = new AsaasWebhookEvent(
+                "PAYMENT_RECEIVED",
+                new AsaasWebhookEvent.PaymentData(
+                        "pay_abc123", "RECEIVED", orderId.toString(),
+                        150.0, 142.5, "PIX",
+                        "https://pay.asaas.com/invoice/abc", "12345"
+                )
         );
 
         webhookService.processEvent(event);
@@ -81,9 +74,7 @@ class InfinitePayWebhookServiceTest {
         verify(paymentRepository, times(1)).save(any(Payment.class));
         assertEquals("APPROVED", payment.getStatus());
         assertNotNull(payment.getPaidAt());
-        assertEquals("txn-uuid-123", payment.getTransactionNSU());
-        assertEquals("abc123", payment.getGatewayId());
-        assertEquals("pix", payment.getPaymentMethod());
+        assertEquals("pay_abc123", payment.getGatewayPaymentId());
         assertEquals(OrderStatus.PAGO.name(), orderEntity.getStatus());
     }
 
@@ -99,8 +90,12 @@ class InfinitePayWebhookServiceTest {
 
         when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(payment));
 
-        InfinitePayWebhookEvent event = new InfinitePayWebhookEvent(
-                "abc123", 1500L, 1510L, 1, "pix", "txn-123", orderId.toString(), null, null
+        AsaasWebhookEvent event = new AsaasWebhookEvent(
+                "PAYMENT_RECEIVED",
+                new AsaasWebhookEvent.PaymentData(
+                        "pay_abc123", "RECEIVED", orderId.toString(),
+                        150.0, 142.5, "PIX", null, null
+                )
         );
 
         webhookService.processEvent(event);
@@ -109,10 +104,14 @@ class InfinitePayWebhookServiceTest {
     }
 
     @Test
-    @DisplayName("should handle missing order_nsu")
-    void shouldHandleMissingOrderNsu() {
-        InfinitePayWebhookEvent event = new InfinitePayWebhookEvent(
-                "abc123", 1500L, 1510L, 1, "pix", "txn-123", null, null, null
+    @DisplayName("should handle missing external reference")
+    void shouldHandleMissingExternalReference() {
+        AsaasWebhookEvent event = new AsaasWebhookEvent(
+                "PAYMENT_RECEIVED",
+                new AsaasWebhookEvent.PaymentData(
+                        "pay_abc123", "RECEIVED", null,
+                        150.0, 142.5, "PIX", null, null
+                )
         );
 
         webhookService.processEvent(event);
@@ -125,8 +124,12 @@ class InfinitePayWebhookServiceTest {
     void shouldHandlePaymentNotFound() {
         when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.empty());
 
-        InfinitePayWebhookEvent event = new InfinitePayWebhookEvent(
-                "abc123", 1500L, 1510L, 1, "pix", "txn-123", orderId.toString(), null, null
+        AsaasWebhookEvent event = new AsaasWebhookEvent(
+                "PAYMENT_RECEIVED",
+                new AsaasWebhookEvent.PaymentData(
+                        "pay_abc123", "RECEIVED", orderId.toString(),
+                        150.0, 142.5, "PIX", null, null
+                )
         );
 
         webhookService.processEvent(event);

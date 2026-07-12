@@ -204,7 +204,7 @@ export function CheckoutPageContent() {
       toast.success("Pedido realizado com sucesso!");
 
       if (result.paymentLink) {
-        console.log("[CHECKOUT] Redirecting to InfinitePay:", result.paymentLink.substring(0, 60) + "...");
+        console.log("[CHECKOUT] Redirecting to Asaas checkout:", result.paymentLink.substring(0, 60) + "...");
         window.location.href = result.paymentLink;
       } else {
         console.log("[CHECKOUT] No paymentLink, redirecting to confirmation");

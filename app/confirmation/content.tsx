@@ -3,13 +3,11 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
-import { Check, Package, Gift, ExternalLink } from "lucide-react";
+import { Check, Package, Gift } from "lucide-react";
 
 export function ConfirmationPageContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
-  const receiptUrl = searchParams.get("receipt_url");
-  const captureMethod = searchParams.get("capture_method");
 
   return (
     <main className="pt-[88px] lg:pt-[96px] min-h-screen bg-[#FFF9F8] flex items-center justify-center px-4 lg:px-6">
@@ -38,7 +36,7 @@ export function ConfirmationPageContent() {
           <div className="grid grid-cols-2 gap-4">
             {[
               { label: "Numero do Pedido", value: orderId ? `#${orderId.slice(0, 8).toUpperCase()}` : "#LSR-2026-08421" },
-              { label: "Pagamento", value: captureMethod ? `Pago via ${captureMethod.toUpperCase()}` : "Confirmado" },
+              { label: "Pagamento", value: "Confirmado" },
               { label: "Entrega Estimada", value: "5 a 10 dias uteis" },
               { label: "Status", value: "Pagamento Confirmado" },
             ].map((row) => (
@@ -51,18 +49,6 @@ export function ConfirmationPageContent() {
             ))}
           </div>
         </div>
-
-        {receiptUrl && (
-          <a
-            href={receiptUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm text-[#D97D93] hover:text-[#C8667F] mb-6 transition-colors"
-          >
-            <ExternalLink size={14} />
-            Ver comprovante de pagamento
-          </a>
-        )}
 
         <div className="flex flex-col gap-3">
           <Link

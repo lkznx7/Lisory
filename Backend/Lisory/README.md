@@ -78,7 +78,7 @@ Lojas de joias enfrentam desafios específicos: garantia diferenciada por tipo d
 | Configurações da Loja | 📄 Documentado |
 | Perfil do Administrador | 📄 Documentado |
 | Dashboard com Estatísticas | 📄 Documentado |
-| Integração InfinitePay | 📄 Planejado |
+| Integração Asaas | ✅ Implementado |
 | Integração Melhor Envio | 📄 Planejado |
 
 > **Legenda:** ✅ Implementado | 📄 Documentado (pendente de implementação) | 🚧 Em desenvolvimento
@@ -873,7 +873,7 @@ As seguintes integrações estão documentadas no modelo de dados ([`Entidades.m
 
 | Integração | Finalidade | Documentado em |
 |---|---|---|
-| **InfinitePay** | Gateway de pagamento (PIX e Cartão de crédito) | `Entidades.md` — Entidade `Payments` |
+| **Asaas** | Gateway de pagamento (PIX e Cartão de crédito) | `Entidades.md` — Entidade `Payments` |
 | **Melhor Envio** | Cálculo de frete, geração de etiquetas e rastreamento | `Entidades.md` — Entidade `Shipments` |
 
 ### Canais de Contato (Planejados)
@@ -907,7 +907,7 @@ As seguintes funcionalidades estão documentadas e planejadas para implementaç�
 
 ### Longo Prazo
 
-- [ ] Integração com InfinitePay
+- [x] Integração com Asaas
 - [ ] Integração com Melhor Envio
 - [ ] Configurações da loja
 - [ ] Carrinho de compras
