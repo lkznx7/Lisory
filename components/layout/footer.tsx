@@ -48,6 +48,7 @@ export function Footer() {
                 { name: "Brilho em Dobro", href: "/product/brilho-em-dobro" },
                 { name: "Colecao de Sonhos", href: "/product/colecao-de-sonhos" },
                 { name: "Experiencia Premium", href: "/product/experiencia-premium" },
+                { name: "Pulseiras", href: "/category?category=pulseiras" },
                 { name: "Todos os Produtos", href: "/category" },
               ],
             },

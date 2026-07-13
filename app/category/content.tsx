@@ -9,6 +9,8 @@ import { api } from "@/lib/api";
 import { mapApiProductToProduct, type ApiProduct, type ApiCategory } from "@/lib/mappers";
 import { SORT_OPTIONS, PRICE_RANGES } from "@/constants";
 import { products as fallbackProducts } from "@/constants/data";
+
+const PULSEIRAS_CATEGORY = { id: "pulseiras-static", name: "Pulseiras", slug: "pulseiras", description: "", active: true, createdAt: "" };
 import { ProductCard } from "@/components/product/product-card";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import type { Product } from "@/types";
@@ -31,10 +33,15 @@ export function CategoryPageContent() {
     api
       .get<ApiCategory[]>("/categories")
       .then((cats) => {
-        if (cats && cats.length > 0) setCategories(cats);
+        if (cats && cats.length > 0) {
+          const hasPulseiras = cats.some((c) => c.slug === "pulseiras");
+          setCategories(hasPulseiras ? cats : [...cats, PULSEIRAS_CATEGORY]);
+        } else {
+          setCategories([PULSEIRAS_CATEGORY]);
+        }
       })
       .catch(() => {
-        // Categories unavailable, filters will use fallback
+        setCategories([PULSEIRAS_CATEGORY]);
       });
   }, []);
 
@@ -287,15 +294,26 @@ export function CategoryPageContent() {
                 ))}
               </div>
             ) : sortedProducts.length === 0 ? (
-              <div className="text-center py-20">
-                <p className="text-[#6E5A5D] text-sm">Nenhum produto encontrado.</p>
-                <button
-                  onClick={() => { setPriceRange([0, 500]); setSelectedCategory(null); }}
-                  className="mt-4 text-xs text-[#D97D93] underline underline-offset-2"
-                >
-                  Limpar filtros
-                </button>
-              </div>
+              selectedCategory === "pulseiras" ? (
+                <div className="text-center py-20">
+                  <p className="font-['Cormorant_Garamond'] text-2xl sm:text-3xl font-semibold text-[#7A4B52] mb-3">
+                    Pulseiras em breve!
+                  </p>
+                  <p className="text-[#6E5A5D] text-sm max-w-md mx-auto">
+                    Estamos preparando uma coleção especial de pulseiras para você. Em breve novidades! ✨
+                  </p>
+                </div>
+              ) : (
+                <div className="text-center py-20">
+                  <p className="text-[#6E5A5D] text-sm">Nenhum produto encontrado.</p>
+                  <button
+                    onClick={() => { setPriceRange([0, 500]); setSelectedCategory(null); }}
+                    className="mt-4 text-xs text-[#D97D93] underline underline-offset-2"
+                  >
+                    Limpar filtros
+                  </button>
+                </div>
+              )
             ) : (
               <div className={`grid gap-3 sm:gap-4 lg:gap-6 ${
                 viewMode === "grid" ? "grid-cols-2 lg:grid-cols-3" : "grid-cols-1"

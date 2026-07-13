@@ -79,7 +79,7 @@ export function CategoriesSection() {
           const Icon = fallbackIcons[i];
           return (
             <motion.div key={scoop.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.5 }}>
-              <Link href={`/product/${scoop.slug}`} className="group relative flex flex-col items-center text-center p-6 sm:p-8 rounded-[18px] bg-gradient-to-b from-[#F8E6E8] to-[#FFF9F8] border border-[#F2DCDD] hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <Link href={scoop.slug === "pulseiras" ? `/category?category=pulseiras` : `/product/${scoop.slug}`} className="group relative flex flex-col items-center text-center p-6 sm:p-8 rounded-[18px] bg-gradient-to-b from-[#F8E6E8] to-[#FFF9F8] border border-[#F2DCDD] hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                 <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#D97D93] to-[#C98A96] rounded-2xl flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform duration-300">
                   <Icon size={26} className="text-white" />
                 </div>

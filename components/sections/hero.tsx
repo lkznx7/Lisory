@@ -33,7 +33,7 @@ export function HeroSection() {
             Lisory
           </h1>
           <p className="text-[#6E5A5D] text-sm sm:text-base lg:text-lg leading-relaxed mb-8 sm:mb-10 max-w-md">
-            Abra seu Scoop e descubra acessórios em aço inoxidável escolhidos para tornar seu momento ainda mais especial.
+            Bem-vinda ao universo Lisory
           </p>
           <div className="flex flex-wrap gap-4">
             <Link

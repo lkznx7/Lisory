@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -69,14 +70,16 @@ export function Navbar() {
           {/* Logo - Left */}
           <Link
             href="/"
-            className="flex flex-col items-start flex-shrink-0"
+            className="flex items-center flex-shrink-0"
           >
-            <span className="font-['Cormorant_Garamond'] text-2xl lg:text-3xl font-semibold tracking-[0.2em] text-[#7A4B52] leading-none">
-              {SITE.name}
-            </span>
-            <span className="text-[8px] tracking-[0.4em] text-[#6E5A5D] uppercase mt-0.5">
-              {SITE.tagline}
-            </span>
+            <Image
+              src="/images/logoSvgNavbar.svg"
+              alt="Lisory"
+              width={120}
+              height={36}
+              className="h-8 lg:h-9 w-auto"
+              priority
+            />
           </Link>
 
           {/* Center Navigation - Desktop */}
@@ -147,6 +150,17 @@ export function Navbar() {
                 )}
               </AnimatePresence>
             </div>
+            <Link
+              href="/category?category=pulseiras"
+              className={cn(
+                "px-4 py-2 text-[13px] font-medium tracking-wide rounded-lg transition-all duration-200",
+                pathname === "/category" && megaMenu !== "scoops"
+                  ? "text-[#D97D93] bg-[#FCEEEF]"
+                  : "text-[#7A4B52] hover:text-[#D97D93] hover:bg-[#FCEEEF]/50"
+              )}
+            >
+              Pulseiras
+            </Link>
             <Link
               href="/category"
               className={cn(
@@ -305,6 +319,13 @@ export function Navbar() {
                 {scoop.name}
               </Link>
             ))}
+            <Link
+              href="/category?category=pulseiras"
+              onClick={() => setMobileOpen(false)}
+              className="w-full flex items-center py-3.5 px-4 text-[14px] font-medium text-[#7A4B52] hover:bg-[#FCEEEF] rounded-xl transition-colors"
+            >
+              Pulseiras
+            </Link>
             <Link
               href="/category"
               onClick={() => setMobileOpen(false)}
