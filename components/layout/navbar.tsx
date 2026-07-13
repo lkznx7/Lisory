@@ -78,14 +78,14 @@ export function Navbar() {
                 <Menu size={20} className="text-[#7A4B52]" />
               </button>
             </div>
-            <div className="justify-self-center">
+            <div className="justify-self-center -mt-1">
               <Link href="/">
                 <Image
                   src="/images/logo-horizontal.svg"
                   alt="Lisory"
                   width={180}
                   height={48}
-                  className="h-14 w-auto"
+                  className="h-50 w-auto"
                   priority
                 />
               </Link>
