@@ -78,7 +78,7 @@ export function Navbar() {
                 <Menu size={20} className="text-[#7A4B52]" />
               </button>
             </div>
-            <div className="justify-self-center -mt-1">
+            <div className="justify-self-center -mt-17">
               <Link href="/">
                 <Image
                   src="/images/logo-horizontal.svg"
