@@ -20,10 +20,9 @@ const defaultSettings: StoreSettings = {
   city: "São Paulo",
   state: "SP",
   zipCode: "01426-001",
-  instagram: "@lisoryoficial",
+  tiktok: "@lisory.acessorios",
   facebook: "lisory",
   twitter: "",
-  tiktok: "@lisory",
   seoTitle: "LISORY - Joias Premium em Aço Inoxidável 316L",
   seoDescription: "Joias premium em aço inox 316L. Hipoalergênico, resistente à água, feito para durar uma vida inteira. Frete grátis acima de R$199.",
 };
@@ -149,8 +148,8 @@ export default function AdminConfiguracoes() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Instagram</Label>
-              <Input value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} maxLength={100} />
+              <Label>TikTok</Label>
+              <Input value={form.tiktok} onChange={(e) => setForm({ ...form, tiktok: e.target.value })} maxLength={100} />
             </div>
             <div className="space-y-2">
               <Label>Facebook</Label>
@@ -159,10 +158,6 @@ export default function AdminConfiguracoes() {
             <div className="space-y-2">
               <Label>Twitter / X</Label>
               <Input value={form.twitter} onChange={(e) => setForm({ ...form, twitter: e.target.value })} maxLength={100} />
-            </div>
-            <div className="space-y-2">
-              <Label>TikTok</Label>
-              <Input value={form.tiktok} onChange={(e) => setForm({ ...form, tiktok: e.target.value })} maxLength={100} />
             </div>
           </div>
         </CardContent>

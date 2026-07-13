@@ -7,7 +7,7 @@ import { NewArrivalsSection } from "@/components/sections/new-arrivals";
 import { FlyerSlider } from "@/components/sections/flyer-slider";
 import { HorizontalBanner } from "@/components/sections/horizontal-banner";
 import { TestimonialsSection } from "@/components/sections/testimonials";
-import { InstagramSection } from "@/components/sections/instagram";
+import { TikTokSection } from "@/components/sections/instagram";
 import { NewsletterSection } from "@/components/sections/newsletter";
 import { HomeFaqSection } from "@/components/sections/home-faq";
 
@@ -23,7 +23,7 @@ export default function HomePage() {
       <NewArrivalsSection />
       <FlyerSlider />
       <TestimonialsSection />
-      <InstagramSection />
+      <TikTokSection />
       <HomeFaqSection />
       <NewsletterSection />
     </>

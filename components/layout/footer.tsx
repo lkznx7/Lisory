@@ -1,5 +1,13 @@
 import Link from "next/link";
-import { Instagram, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
+
+function TikTokIcon({ size = 15 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.76a8.28 8.28 0 004.76 1.52V6.83a4.84 4.84 0 01-1-.14z"/>
+    </svg>
+  );
+}
 
 export function Footer() {
   return (
@@ -18,7 +26,7 @@ export function Footer() {
             </p>
             <div className="flex gap-3">
               {[
-                { icon: Instagram, href: "https://instagram.com/uselisory" },
+                { icon: TikTokIcon, href: "https://www.tiktok.com/@lisory.acessorios" },
                 { icon: Mail, href: "mailto:Lisoryacessorios@gmail.com" },
               ].map(({ icon: Icon, href }, i) => (
                 <Link

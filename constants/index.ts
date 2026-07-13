@@ -5,7 +5,7 @@ export const SITE = {
   url: "https://lisory.com.br",
   email: "Lisoryacessorios@gmail.com",
   phone: "",
-  instagram: "@uselisory",
+  tiktok: "@lisory.acessorios",
 };
 
 export const FREE_SHIPPING_THRESHOLD = 149;

@@ -12,10 +12,9 @@ export interface StoreSettings {
   city: string;
   state: string;
   zipCode: string;
-  instagram: string;
+  tiktok: string;
   facebook: string;
   twitter: string;
-  tiktok: string;
   seoTitle: string;
   seoDescription: string;
 }

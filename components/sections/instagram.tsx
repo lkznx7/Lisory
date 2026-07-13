@@ -1,53 +1,36 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Instagram } from "lucide-react";
 
-const images = [
-  "/images/instagram-1.jpg",
-  "/images/instagram-2.jpg",
-  "/images/instagram-3.jpg",
-  "/images/instagram-4.jpg",
-  "/images/instagram-5.jpg",
-  "/images/instagram-6.jpg",
-];
+function TikTokIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.76a8.28 8.28 0 004.76 1.52V6.83a4.84 4.84 0 01-1-.14z"/>
+    </svg>
+  );
+}
 
-export function InstagramSection() {
+export function TikTokSection() {
   return (
     <section className="py-20 px-4 lg:px-6 max-w-7xl mx-auto">
-      <div className="text-center mb-10">
+      <div className="text-center">
         <p className="text-xs tracking-[0.4em] text-[#D97D93] uppercase mb-4">
           Siga-nos
         </p>
-        <h2 className="font-['Cormorant_Garamond'] text-4xl font-light text-[#7A4B52] mb-2">
-          @uselisory
+        <h2 className="font-['Cormorant_Garamond'] text-4xl font-light text-[#7A4B52] mb-4">
+          @lisory.acessorios
         </h2>
-      </div>
-      <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
-        {images.map((id, i) => (
-          <motion.div
-            key={id}
-            className="group relative aspect-square overflow-hidden rounded-[14px] bg-[#FCEEEF] cursor-pointer"
-            whileHover={{ scale: 1.03 }}
-            transition={{ duration: 0.2 }}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            style={{ transitionDelay: `${i * 50}ms` }}
-          >
-            <img
-              src={id}
-              alt="Instagram Lisory"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-[#7A4B52]/0 group-hover:bg-[#7A4B52]/30 transition-colors duration-200 flex items-center justify-center">
-              <Instagram
-                size={20}
-                className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              />
-            </div>
-          </motion.div>
-        ))}
+        <motion.a
+          href="https://www.tiktok.com/@lisory.acessorios"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-[#7A4B52] text-white text-sm font-semibold rounded-xl hover:bg-[#6A3E45] transition-colors"
+          whileHover={{ scale: 1.03 }}
+          transition={{ duration: 0.2 }}
+        >
+          <TikTokIcon size={18} />
+          Seguir no TikTok
+        </motion.a>
       </div>
     </section>
   );
