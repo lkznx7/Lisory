@@ -51,7 +51,7 @@ services:
       MELHOR_ENVIO_SCOPES: ${MELHOR_ENVIO_SCOPES:-cart-read cart-write orders-read shipping-calculate shipping-cancel shipping-checkout shipping-companies shipping-generate shipping-preview shipping-print shipping-share shipping-tracking}
       MELHOR_ENVIO_ORIGIN_CEP: ${MELHOR_ENVIO_ORIGIN_CEP:-01310-100}
       # Asaas (sandbox: https://api-sandbox.asaas.com/v3, production: https://api.asaas.com/v3)
-      ASAAS_API_KEY: ${ASAAS_API_KEY:-}
+      ASAAS_API_KEY: ${ASAAS_API_KEY:?Set ASAAS_API_KEY in .env}
       ASAAS_API_URL: ${ASAAS_API_URL:-https://api-sandbox.asaas.com/v3}
       ASAAS_REDIRECT_URL: ${ASAAS_REDIRECT_URL:-https://lisory.com.br/payment-return}
 

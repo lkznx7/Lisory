@@ -30,3 +30,9 @@ Thumbs.db
 # Misc
 *.log
 npm-debug.log*
+
+# Build artifacts
+build/
+test-results/
+playwright-report/
+*.tsbuildinfo
