@@ -68,39 +68,42 @@ export function Navbar() {
 
         <div className="h-16 lg:h-[72px] max-w-7xl mx-auto px-4 lg:px-6">
           {/* Mobile Navbar */}
-          <div className="lg:hidden h-full flex items-center justify-between relative">
-            <button
-              onClick={() => setMobileOpen(true)}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200"
-              aria-label="Menu"
-            >
-              <Menu size={20} className="text-[#7A4B52]" />
-            </button>
-            <Link
-              href="/"
-              className="absolute left-1/2 -translate-x-1/2"
-            >
-              <Image
-                src="/images/image 1.svg"
-                alt="Lisory"
-                width={180}
-                height={48}
-                className="h-10 w-auto"
-                priority
-              />
-            </Link>
-            <Link
-              href="/cart"
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200 relative"
-              aria-label="Carrinho"
-            >
-              <ShoppingBag size={20} className="text-[#7A4B52]" />
-              {cartCount > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 bg-[#D97D93] text-white text-[9px] font-semibold rounded-full flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </Link>
+          <div className="lg:hidden h-full grid items-center" style={{ gridTemplateColumns: "1fr auto 1fr" }}>
+            <div className="justify-self-start">
+              <button
+                onClick={() => setMobileOpen(true)}
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200"
+                aria-label="Menu"
+              >
+                <Menu size={20} className="text-[#7A4B52]" />
+              </button>
+            </div>
+            <div className="justify-self-center">
+              <Link href="/">
+                <Image
+                  src="/images/logo-horizontal.svg"
+                  alt="Lisory"
+                  width={180}
+                  height={48}
+                  className="h-10 w-auto"
+                  priority
+                />
+              </Link>
+            </div>
+            <div className="justify-self-end">
+              <Link
+                href="/cart"
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200 relative"
+                aria-label="Carrinho"
+              >
+                <ShoppingBag size={20} className="text-[#7A4B52]" />
+                {cartCount > 0 && (
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-[#D97D93] text-white text-[9px] font-semibold rounded-full flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            </div>
           </div>
 
           {/* Desktop Navbar */}
