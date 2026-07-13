@@ -77,7 +77,7 @@ export function Navbar() {
               alt="Lisory"
               width={120}
               height={36}
-              className="h-8 lg:h-9 w-auto"
+              className="h-10 lg:h-12 w-auto"
               priority
             />
           </Link>
