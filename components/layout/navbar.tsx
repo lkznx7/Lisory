@@ -66,193 +66,243 @@ export function Navbar() {
           TROCA GRATIS · EXPERIENCIA SCOOP
         </div>
 
-        <div className="h-16 lg:h-[72px] max-w-7xl mx-auto px-4 lg:px-6 flex items-center justify-between">
-          {/* Logo - Left */}
-          <Link
-            href="/"
-            className="flex items-center flex-shrink-0"
-          >
-            <Image
-              src="/images/logoSvgNavbar.svg"
-              alt="Lisory"
-              width={120}
-              height={36}
-              className="h-10 lg:h-12 w-auto"
-              priority
-            />
-          </Link>
-
-          {/* Center Navigation - Desktop */}
-          <nav className="hidden lg:flex items-center justify-center flex-1 gap-1 mx-8">
-            <Link
-              href="/"
-              className={cn(
-                "px-4 py-2 text-[13px] font-medium tracking-wide rounded-lg transition-all duration-200",
-                pathname === "/"
-                  ? "text-[#D97D93] bg-[#FCEEEF]"
-                  : "text-[#7A4B52] hover:text-[#D97D93] hover:bg-[#FCEEEF]/50"
-              )}
-            >
-              Inicio
-            </Link>
-            <div
-              className="relative"
-              onMouseEnter={() => setMegaMenu("scoops")}
-              onMouseLeave={() => setMegaMenu(null)}
-            >
-              <button
-                className={cn(
-                  "px-4 py-2 text-[13px] font-medium tracking-wide rounded-lg transition-all duration-200",
-                  pathname.startsWith("/product/")
-                    ? "text-[#D97D93] bg-[#FCEEEF]"
-                    : "text-[#7A4B52] hover:text-[#D97D93] hover:bg-[#FCEEEF]/50"
-                )}
-              >
-                Scoops
-              </button>
-              <AnimatePresence>
-                {megaMenu === "scoops" && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 8 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[550px] bg-white rounded-xl shadow-xl border border-[#F2DCDD] p-6"
-                  >
-                    <div className="grid grid-cols-2 gap-6">
-                      {scoopLinks.map((scoop) => (
-                        <Link
-                          key={scoop.name}
-                          href={scoop.href}
-                          className="group flex items-center gap-4 p-3 rounded-xl hover:bg-[#FCEEEF] transition-colors"
-                        >
-                          <div className="w-10 h-10 bg-[#F8D8D3] rounded-xl flex items-center justify-center text-[#D97D93] flex-shrink-0">
-                            <Gift size={18} />
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-[#7A4B52] group-hover:text-[#D97D93] transition-colors">
-                              {scoop.name}
-                            </p>
-                            <p className="text-xs text-[#6E5A5D]">{scoop.desc}</p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                    <div className="mt-4 pt-4 border-t border-[#F2DCDD] text-center">
-                      <Link
-                        href="/category"
-                        className="text-sm text-[#D97D93] hover:text-[#C8667F] font-medium transition-colors"
-                      >
-                        Ver todos os Produtos →
-                      </Link>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-            <Link
-              href="/category?category=pulseiras"
-              className={cn(
-                "px-4 py-2 text-[13px] font-medium tracking-wide rounded-lg transition-all duration-200",
-                pathname === "/category" && megaMenu !== "scoops"
-                  ? "text-[#D97D93] bg-[#FCEEEF]"
-                  : "text-[#7A4B52] hover:text-[#D97D93] hover:bg-[#FCEEEF]/50"
-              )}
-            >
-              Pulseiras
-            </Link>
-            <Link
-              href="/category"
-              className={cn(
-                "px-4 py-2 text-[13px] font-medium tracking-wide rounded-lg transition-all duration-200",
-                pathname === "/category"
-                  ? "text-[#D97D93] bg-[#FCEEEF]"
-                  : "text-[#7A4B52] hover:text-[#D97D93] hover:bg-[#FCEEEF]/50"
-              )}
-            >
-              Todos
-            </Link>
-          </nav>
-
-          {/* Right Icons */}
-          <div className="flex items-center gap-0.5 lg:gap-1 flex-shrink-0">
+        <div className="h-16 lg:h-[72px] max-w-7xl mx-auto px-4 lg:px-6">
+          {/* Mobile Navbar */}
+          <div className="lg:hidden h-full flex items-center justify-between relative">
             <button
-              onClick={() => setSearchOpen(!searchOpen)}
-              className="w-9 h-9 lg:w-10 lg:h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200"
-              aria-label="Buscar"
+              onClick={() => setMobileOpen(true)}
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200"
+              aria-label="Menu"
             >
-              <Search size={18} className="text-[#7A4B52]" />
+              <Menu size={20} className="text-[#7A4B52]" />
             </button>
             <Link
-              href="/wishlist"
-              className="w-9 h-9 lg:w-10 lg:h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200 relative"
-              aria-label="Favoritos"
+              href="/"
+              className="absolute left-1/2 -translate-x-1/2"
             >
-              <Heart size={18} className="text-[#7A4B52]" />
-              {wishlist.length > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 bg-[#D97D93] text-white text-[9px] font-semibold rounded-full flex items-center justify-center">
-                  {wishlist.length}
-                </span>
-              )}
+              <Image
+                src="/images/image 1.svg"
+                alt="Lisory"
+                width={180}
+                height={48}
+                className="h-10 w-auto"
+                priority
+              />
             </Link>
-
-            {/* Auth buttons - Desktop */}
-            {!isLoading && (
-              <div className="hidden lg:flex items-center gap-1">
-                {user ? (
-                  <>
-                    {isAdmin && (
-                      <Link
-                        href="/admin"
-                        className="w-9 h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200"
-                        aria-label="Admin"
-                      >
-                        <Shield size={18} className="text-[#7A4B52]" />
-                      </Link>
-                    )}
-                    <button
-                      onClick={logout}
-                      className="w-9 h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200"
-                      aria-label="Sair"
-                    >
-                      <LogOut size={18} className="text-[#7A4B52]" />
-                    </button>
-                  </>
-                ) : (
-                  <Link
-                    href="/login"
-                    className="w-9 h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200"
-                    aria-label="Entrar"
-                  >
-                    <User size={18} className="text-[#7A4B52]" />
-                  </Link>
-                )}
-              </div>
-            )}
-
             <Link
               href="/cart"
-              className="w-9 h-9 lg:w-10 lg:h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200 relative"
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200 relative"
               aria-label="Carrinho"
             >
-              <ShoppingBag size={18} className="text-[#7A4B52]" />
+              <ShoppingBag size={20} className="text-[#7A4B52]" />
               {cartCount > 0 && (
                 <span className="absolute top-1 right-1 w-4 h-4 bg-[#D97D93] text-white text-[9px] font-semibold rounded-full flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
             </Link>
-            <button
-              onClick={() => setMobileOpen(true)}
-              className="lg:hidden w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200"
-              aria-label="Menu"
+          </div>
+
+          {/* Desktop Navbar */}
+          <div className="hidden lg:flex items-center justify-between h-full">
+            {/* Logo - Left */}
+            <Link
+              href="/"
+              className="flex items-center flex-shrink-0"
             >
-              <Menu size={18} className="text-[#7A4B52]" />
-            </button>
+              <Image
+                src="/images/logoSvgNavbar.svg"
+                alt="Lisory"
+                width={120}
+                height={36}
+                className="h-10 lg:h-12 w-auto"
+                priority
+              />
+            </Link>
+
+            {/* Center Navigation */}
+            <nav className="flex items-center justify-center flex-1 gap-1 mx-8">
+              <Link
+                href="/"
+                className={cn(
+                  "px-4 py-2 text-[13px] font-medium tracking-wide rounded-lg transition-all duration-200",
+                  pathname === "/"
+                    ? "text-[#D97D93] bg-[#FCEEEF]"
+                    : "text-[#7A4B52] hover:text-[#D97D93] hover:bg-[#FCEEEF]/50"
+                )}
+              >
+                Inicio
+              </Link>
+              <div
+                className="relative"
+                onMouseEnter={() => setMegaMenu("scoops")}
+                onMouseLeave={() => setMegaMenu(null)}
+              >
+                <button
+                  className={cn(
+                    "px-4 py-2 text-[13px] font-medium tracking-wide rounded-lg transition-all duration-200",
+                    pathname.startsWith("/product/")
+                      ? "text-[#D97D93] bg-[#FCEEEF]"
+                      : "text-[#7A4B52] hover:text-[#D97D93] hover:bg-[#FCEEEF]/50"
+                  )}
+                >
+                  Scoops
+                </button>
+                <AnimatePresence>
+                  {megaMenu === "scoops" && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 8 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[550px] bg-white rounded-xl shadow-xl border border-[#F2DCDD] p-6"
+                    >
+                      <div className="grid grid-cols-2 gap-6">
+                        {scoopLinks.map((scoop) => (
+                          <Link
+                            key={scoop.name}
+                            href={scoop.href}
+                            className="group flex items-center gap-4 p-3 rounded-xl hover:bg-[#FCEEEF] transition-colors"
+                          >
+                            <div className="w-10 h-10 bg-[#F8D8D3] rounded-xl flex items-center justify-center text-[#D97D93] flex-shrink-0">
+                              <Gift size={18} />
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-[#7A4B52] group-hover:text-[#D97D93] transition-colors">
+                                {scoop.name}
+                              </p>
+                              <p className="text-xs text-[#6E5A5D]">{scoop.desc}</p>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                      <div className="mt-4 pt-4 border-t border-[#F2DCDD] text-center">
+                        <Link
+                          href="/category"
+                          className="text-sm text-[#D97D93] hover:text-[#C8667F] font-medium transition-colors"
+                        >
+                          Ver todos os Produtos →
+                        </Link>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+              <Link
+                href="/category?category=pulseiras"
+                className={cn(
+                  "px-4 py-2 text-[13px] font-medium tracking-wide rounded-lg transition-all duration-200",
+                  pathname === "/category" && megaMenu !== "scoops"
+                    ? "text-[#D97D93] bg-[#FCEEEF]"
+                    : "text-[#7A4B52] hover:text-[#D97D93] hover:bg-[#FCEEEF]/50"
+                )}
+              >
+                Pulseiras
+              </Link>
+              <Link
+                href="/category"
+                className={cn(
+                  "px-4 py-2 text-[13px] font-medium tracking-wide rounded-lg transition-all duration-200",
+                  pathname === "/category"
+                    ? "text-[#D97D93] bg-[#FCEEEF]"
+                    : "text-[#7A4B52] hover:text-[#D97D93] hover:bg-[#FCEEEF]/50"
+                )}
+              >
+                Todos
+              </Link>
+            </nav>
+
+            {/* Right Icons */}
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <button
+                onClick={() => setSearchOpen(!searchOpen)}
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200"
+                aria-label="Buscar"
+              >
+                <Search size={18} className="text-[#7A4B52]" />
+              </button>
+              <Link
+                href="/wishlist"
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200 relative"
+                aria-label="Favoritos"
+              >
+                <Heart size={18} className="text-[#7A4B52]" />
+                {wishlist.length > 0 && (
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-[#D97D93] text-white text-[9px] font-semibold rounded-full flex items-center justify-center">
+                    {wishlist.length}
+                  </span>
+                )}
+              </Link>
+              {!isLoading && (
+                <div className="flex items-center gap-1">
+                  {user ? (
+                    <>
+                      {isAdmin && (
+                        <Link
+                          href="/admin"
+                          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200"
+                          aria-label="Admin"
+                        >
+                          <Shield size={18} className="text-[#7A4B52]" />
+                        </Link>
+                      )}
+                      <button
+                        onClick={logout}
+                        className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200"
+                        aria-label="Sair"
+                      >
+                        <LogOut size={18} className="text-[#7A4B52]" />
+                      </button>
+                    </>
+                  ) : (
+                    <Link
+                      href="/login"
+                      className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200"
+                      aria-label="Entrar"
+                    >
+                      <User size={18} className="text-[#7A4B52]" />
+                    </Link>
+                  )}
+                </div>
+              )}
+              <Link
+                href="/cart"
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#FCEEEF] transition-colors duration-200 relative"
+                aria-label="Carrinho"
+              >
+                <ShoppingBag size={18} className="text-[#7A4B52]" />
+                {cartCount > 0 && (
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-[#D97D93] text-white text-[9px] font-semibold rounded-full flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            </div>
           </div>
         </div>
 
-        {/* Search bar */}
+        {/* Search bar - Mobile: always visible */}
+        <div className="lg:hidden border-t border-[#F2DCDD]">
+          <div className="max-w-2xl mx-auto px-4 py-3">
+            <div className="flex items-center gap-3 bg-white border border-[#F2DCDD] rounded-xl px-4 h-11">
+              <Search size={16} className="text-[#6E5A5D] flex-shrink-0" />
+              <input
+                className="flex-1 bg-transparent text-sm text-[#7A4B52] placeholder-[#6E5A5D] outline-none"
+                placeholder="Pesquisar produtos..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && searchQuery.trim()) {
+                    router.push(`/category?search=${encodeURIComponent(searchQuery.trim())}`);
+                    setSearchQuery("");
+                  }
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Search bar - Desktop: toggled */}
         <AnimatePresence>
           {searchOpen && (
             <motion.div
@@ -260,7 +310,7 @@ export function Navbar() {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="overflow-hidden border-t border-[#F2DCDD]"
+              className="hidden lg:block overflow-hidden border-t border-[#F2DCDD]"
             >
               <div className="max-w-2xl mx-auto px-4 lg:px-6 py-4">
                 <div className="flex items-center gap-3 bg-white border border-[#F2DCDD] rounded-xl px-4 h-12">
