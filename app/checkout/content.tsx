@@ -110,7 +110,8 @@ export function CheckoutPageContent() {
         setSelectedShipping(options[0]);
       }
     } catch {
-      setShippingOptions([{ carrier: "PAC", service: "PAC", cost: 0, estimatedDays: 10 }]);
+      setShippingOptions([]);
+      toast.error("Erro ao calcular frete. Tente novamente.");
     } finally {
       setLoadingShipping(false);
     }
@@ -344,7 +345,9 @@ export function CheckoutPageContent() {
                             className="text-[#D97D93]"
                           />
                           <div>
-                            <p className="text-sm font-semibold text-[#7A4B52]">{option.carrier} - {option.service}</p>
+                            <p className="text-sm font-semibold text-[#7A4B52]">
+                              {option.service && !option.service.startsWith(".") ? option.service : option.carrier}
+                            </p>
                             <p className="text-xs text-[#6E5A5D] mt-0.5">
                               Prazo estimado: {option.estimatedDays} dias uteis
                             </p>
@@ -354,7 +357,7 @@ export function CheckoutPageContent() {
                           {option.cost === 0 ? (
                             <span className="text-[#3E8B5A]">Gratis</span>
                           ) : (
-                            `R$ ${option.cost.toFixed(2)}`
+                            `R$ ${option.cost.toFixed(2).replace(".", ",")}`
                           )}
                         </p>
                       </label>

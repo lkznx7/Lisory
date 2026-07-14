@@ -50,7 +50,8 @@ export function CartPageContent() {
         setShippingCost(options[0].cost);
       }
     } catch {
-      setShippingCost(0);
+      setShippingCost(null);
+      toast.error("Erro ao calcular frete. Tente novamente.");
     } finally {
       setLoadingShipping(false);
     }
@@ -213,7 +214,7 @@ export function CartPageContent() {
                         ? "Calculando..."
                         : shipping === 0
                           ? "Gratis"
-                          : `R$${shipping.toFixed(2)}`}
+                          : `R$ ${shipping.toFixed(2).replace(".", ",")}`}
                     </span>
                   </div>
                 </div>
