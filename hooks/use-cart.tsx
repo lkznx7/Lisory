@@ -104,13 +104,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const removeItem = useCallback(
     async (id: string) => {
+      const localItem = items.find((i) => i.id === id);
       setItems((prev) => prev.filter((i) => i.id !== id));
 
       try {
-        const currentState = await api.get<ApiCartResponse>("/cart");
-        const backendItem = currentState.items.find((i) => i.productId === id);
-        if (backendItem) {
-          await api.delete(`/cart/items/${backendItem.id}`);
+        let backendItemId = localItem?.backendCartItemId;
+        if (!backendItemId) {
+          const currentState = await api.get<ApiCartResponse>("/cart");
+          const backendItem = currentState.items.find(
+            (i) => i.productId === id || (localItem && i.productName === localItem.name)
+          );
+          backendItemId = backendItem?.id;
+        }
+
+        if (backendItemId) {
+          await api.delete(`/cart/items/${backendItemId}`);
         }
         await refreshCart();
       } catch (e) {
@@ -118,7 +126,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         await refreshCart();
       }
     },
-    [refreshCart]
+    [items, refreshCart]
   );
 
   const updateQuantity = useCallback(
@@ -127,13 +135,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
         removeItem(id);
         return;
       }
+      const localItem = items.find((i) => i.id === id);
       setItems((prev) => prev.map((i) => (i.id === id ? { ...i, qty } : i)));
 
       try {
-        const currentState = await api.get<ApiCartResponse>("/cart");
-        const backendItem = currentState.items.find((i) => i.productId === id);
-        if (backendItem) {
-          await api.put(`/cart/items/${backendItem.id}`, { quantity: qty });
+        let backendItemId = localItem?.backendCartItemId;
+        if (!backendItemId) {
+          const currentState = await api.get<ApiCartResponse>("/cart");
+          const backendItem = currentState.items.find(
+            (i) => i.productId === id || (localItem && i.productName === localItem.name)
+          );
+          backendItemId = backendItem?.id;
+        }
+
+        if (backendItemId) {
+          await api.put(`/cart/items/${backendItemId}`, { quantity: qty });
         }
         await refreshCart();
       } catch (e) {
@@ -141,7 +157,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         await refreshCart();
       }
     },
-    [refreshCart, removeItem]
+    [items, refreshCart, removeItem]
   );
 
   const clearCart = useCallback(async () => {

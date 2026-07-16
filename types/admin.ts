@@ -94,7 +94,8 @@ export type PaymentStatus =
   | "approved"
   | "refunded"
   | "cancelled"
-  | "chargeback";
+  | "chargeback"
+  | "pagamento_na_retirada";
 
 export interface Address {
   street: string;

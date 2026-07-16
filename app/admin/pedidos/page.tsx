@@ -50,6 +50,7 @@ const paymentStatusConfig: Record<string, { label: string; color: string }> = {
   refunded: { label: "Reembolsado", color: "bg-red-100 text-red-700" },
   cancelled: { label: "Cancelado", color: "bg-gray-100 text-gray-700" },
   chargeback: { label: "Chargeback", color: "bg-rose-100 text-rose-700" },
+  pagamento_na_retirada: { label: "Pagar na Retirada", color: "bg-blue-100 text-blue-700" },
 };
 
 const statusTimeline: OrderStatus[] = [

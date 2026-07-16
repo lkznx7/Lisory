@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
-import { Check, Package, Gift, Clock, AlertCircle } from "lucide-react";
+import { Check, Package, Gift, Clock, AlertCircle, MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 
@@ -13,6 +13,7 @@ interface OrderData {
   paymentStatus: string;
   paymentMethod: string;
   total: number;
+  shippingCarrier?: string;
   createdAt: string;
 }
 
@@ -42,6 +43,14 @@ export function ConfirmationPageContent() {
       .catch(() => setError("Erro ao carregar pedido"))
       .finally(() => setLoading(false));
   }, [orderId]);
+
+  useEffect(() => {
+    if (order && order.status === "PAGO" && order.shippingCarrier === "Retirada no Local") {
+      const orderIdShort = order.id.slice(0, 8).toUpperCase();
+      const msg = `Olá! Acabei de realizar um pedido com a opção Retirada no Local e gostaria de combinar o dia e o horário para retirada. Meu número do pedido é: #${orderIdShort}.`;
+      window.location.href = `https://wa.me/5561983504415?text=${encodeURIComponent(msg)}`;
+    }
+  }, [order]);
 
   const statusInfo = order ? STATUS_LABELS[order.status] || STATUS_LABELS.PENDING_PAYMENT : null;
   const isPaid = order?.status === "PAGO";
@@ -78,21 +87,51 @@ export function ConfirmationPageContent() {
             <p className="text-xs tracking-[0.4em] uppercase mb-4" style={{ color: statusInfo.color }}>
               {statusInfo.label}
             </p>
-            <h1 className="font-['Cormorant_Garamond'] text-4xl font-light text-[#7A4B52] mb-4">
-              {isPaid ? "Sua surpresa esta a caminho!" : "Aguardando confirmacao de pagamento"}
-            </h1>
-            <p className="text-[#6E5A5D] text-sm leading-relaxed mb-8 flex items-center justify-center gap-2">
-              <Gift size={16} className="text-[#D97D93]" />
-              {isPaid
-                ? "Recebemos seu pedido e em breve voce recebera um e-mail com os detalhes e o codigo de rastreamento."
-                : "Seu pedido foi registrado. Assim que o pagamento for confirmado, voce recebera um e-mail com os detalhes."}
-            </p>
+            {order.shippingCarrier === "Retirada no Local" ? (
+              <>
+                <h1 className="font-['Cormorant_Garamond'] text-4xl font-light text-[#7A4B52] mb-4">
+                  Seu pedido foi recebido!
+                </h1>
+                <div className="text-[#6E5A5D] text-sm leading-relaxed mb-8 space-y-4">
+                  <p>
+                    Para combinar o dia e horário da retirada, entre em contato pelo WhatsApp:
+                  </p>
+                  <p className="font-bold text-lg text-[#7A4B52]">(61) 98350-4415</p>
+                  <p>
+                    Nossa equipe combinará o melhor horário para retirada do pedido.
+                  </p>
+                  <div className="flex justify-center pt-2">
+                    <a
+                      href={`https://wa.me/5561983504415?text=${encodeURIComponent("Olá! Acabei de realizar um pedido no site e gostaria de combinar a retirada do mesmo.")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 px-6 h-12 bg-[#25D366] hover:bg-[#20BA5C] text-white text-sm font-semibold rounded-xl transition-colors"
+                    >
+                      <MessageCircle size={18} />
+                      Falar no WhatsApp
+                    </a>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <h1 className="font-['Cormorant_Garamond'] text-4xl font-light text-[#7A4B52] mb-4">
+                  {isPaid ? "Sua surpresa esta a caminho!" : "Aguardando confirmacao de pagamento"}
+                </h1>
+                <p className="text-[#6E5A5D] text-sm leading-relaxed mb-8 flex items-center justify-center gap-2">
+                  <Gift size={16} className="text-[#D97D93]" />
+                  {isPaid
+                    ? "Recebemos seu pedido e em breve voce recebera um e-mail com os detalhes e o codigo de rastreamento."
+                    : "Seu pedido foi registrado. Assim que o pagamento for confirmado, voce recebera um e-mail com os detalhes."}
+                </p>
+              </>
+            )}
 
             <div className="bg-white border border-[#F2DCDD] rounded-[24px] p-6 text-left mb-8">
               <div className="grid grid-cols-2 gap-4">
                 {[
                   { label: "Numero do Pedido", value: `#${orderId!.slice(0, 8).toUpperCase()}` },
-                  { label: "Pagamento", value: isPaid ? "Confirmado" : "Aguardando" },
+                  { label: "Pagamento", value: order.paymentMethod === "PAGAR_NA_RETIRADA" ? "Na Retirada" : isPaid ? "Confirmado" : "Aguardando" },
                   { label: "Total", value: `R$ ${order.total.toFixed(2).replace(".", ",")}` },
                   { label: "Status", value: statusInfo.label },
                 ].map((row) => (

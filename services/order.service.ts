@@ -59,6 +59,7 @@ function mapPaymentStatus(backendStatus: string | null): AdminOrder["paymentStat
     APPROVED: "approved",
     REFUNDED: "refunded",
     CANCELLED: "cancelled",
+    PAGAMENTO_NA_RETIRADA: "pagamento_na_retirada",
   };
   return backendStatus ? map[backendStatus] || "pending" : "pending";
 }

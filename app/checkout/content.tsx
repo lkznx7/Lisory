@@ -36,7 +36,7 @@ interface ViaCepResponse {
   erro?: boolean;
 }
 
-function validateStep(step: number, data: CheckoutData): string | null {
+function validateStep(step: number, data: CheckoutData, deliveryType: "delivery" | "pickup"): string | null {
   switch (step) {
     case 1:
       if (!data.guestName.trim()) return "Nome e obrigatorio";
@@ -48,6 +48,7 @@ function validateStep(step: number, data: CheckoutData): string | null {
       if (!data.guestPhone.trim()) return "Telefone e obrigatorio";
       return null;
     case 2:
+      if (deliveryType === "pickup") return null;
       if (!data.zipCode.trim()) return "CEP e obrigatorio";
       if (data.zipCode.replace(/\D/g, "").length !== 8) return "CEP deve ter 8 digitos";
       if (!data.street.trim()) return "Rua e obrigatoria";
@@ -74,6 +75,7 @@ export function CheckoutPageContent() {
   const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
   const [selectedShipping, setSelectedShipping] = useState<ShippingOption | null>(null);
   const [loadingShipping, setLoadingShipping] = useState(false);
+  const [deliveryType, setDeliveryType] = useState<"delivery" | "pickup">("delivery");
   const [data, setData] = useState<CheckoutData>({
     guestName: "",
     guestEmail: "",
@@ -119,13 +121,13 @@ export function CheckoutPageContent() {
   }, [items]);
 
   useEffect(() => {
-    if (data.zipCode && data.zipCode.length === 8) {
+    if (data.zipCode && data.zipCode.length === 8 && deliveryType === "delivery") {
       const timeoutId = setTimeout(() => {
         calculateFreight(data.zipCode);
       }, 0);
       return () => clearTimeout(timeoutId);
     }
-  }, [data.zipCode, calculateFreight]);
+  }, [data.zipCode, calculateFreight, deliveryType]);
 
   const handleCepBlur = async (value: string) => {
     const cep = value.replace(/\D/g, "");
@@ -148,9 +150,19 @@ export function CheckoutPageContent() {
   };
 
   const handleNext = () => {
-    const error = validateStep(step, data);
+    const error = validateStep(step, data, deliveryType);
     if (error) {
       toast.error(error);
+      return;
+    }
+    if (step === 2 && deliveryType === "pickup") {
+      setSelectedShipping({
+        carrier: DELIVERY_METHODS.PICKUP,
+        service: "Retirada",
+        cost: 0,
+        estimatedDays: 0,
+      });
+      setStep(4);
       return;
     }
     if (step === 3 && !selectedShipping) {
@@ -169,7 +181,7 @@ export function CheckoutPageContent() {
       return;
     }
 
-    const paymentError = validateStep(4, data);
+    const paymentError = validateStep(4, data, deliveryType);
     if (paymentError) {
       toast.error(paymentError);
       return;
@@ -204,6 +216,8 @@ export function CheckoutPageContent() {
         const encodedMsg = encodeURIComponent(WHATSAPP_MESSAGE);
         window.open(`https://wa.me/${SITE.whatsapp}?text=${encodedMsg}`, "_blank");
       }
+
+
 
       if (!result.invoiceUrl) {
         toast.error("Erro ao gerar link de pagamento. Tente novamente.");
@@ -300,31 +314,81 @@ export function CheckoutPageContent() {
             {step === 2 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
                 <h2 className="font-['Cormorant_Garamond'] text-2xl sm:text-3xl font-light text-[#7A4B52] mb-4 sm:mb-6">
-                  Endereco de Entrega
+                  Opcao de Entrega
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {[
-                    { label: "CEP", field: "zipCode" as const, placeholder: "00000000", full: false },
-                    { label: "Rua", field: "street" as const, placeholder: "Nome da rua", full: true },
-                    { label: "Numero", field: "number" as const, placeholder: "123", full: false },
-                    { label: "Complemento", field: "complement" as const, placeholder: "Apto, Sala...", full: false },
-                    { label: "Bairro", field: "neighborhood" as const, placeholder: "Bairro", full: false },
-                    { label: "Cidade", field: "city" as const, placeholder: "Cidade", full: false },
-                    { label: "Estado", field: "state" as const, placeholder: "SP", full: false },
-                  ].map((field) => (
-                    <div key={field.label} className={field.full ? "sm:col-span-2" : ""}>
-                      <label className="block text-xs font-semibold text-[#7A4B52] mb-2">{field.label}</label>
-                      <input
-                        placeholder={field.placeholder}
-                        value={data[field.field]}
-                        onChange={(e) => updateField(field.field, e.target.value)}
-                        onBlur={field.field === "zipCode" ? (e) => handleCepBlur(e.target.value) : undefined}
-                        maxLength={field.field === "zipCode" ? 8 : field.field === "street" ? 255 : field.field === "number" ? 10 : field.field === "complement" ? 100 : field.field === "neighborhood" ? 100 : field.field === "city" ? 100 : 2}
-                        className="w-full h-12 px-4 border border-[#F2DCDD] rounded-xl text-sm text-[#7A4B52] placeholder-[#6E5A5D] outline-none focus:border-[#D97D93] transition-colors bg-white"
-                      />
-                    </div>
-                  ))}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                  <button
+                    type="button"
+                    onClick={() => setDeliveryType("delivery")}
+                    className={`p-4 border rounded-[14px] text-left transition-all ${
+                      deliveryType === "delivery"
+                        ? "border-[#D97D93] bg-[#FCEEEF]"
+                        : "border-[#F2DCDD] bg-white hover:border-[#C98A96]"
+                    }`}
+                  >
+                    <p className="text-sm font-semibold text-[#7A4B52]">Receber no endereco</p>
+                    <p className="text-xs text-[#6E5A5D] mt-0.5">Enviaremos por transportadora ou Uber Flash</p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDeliveryType("pickup");
+                      setSelectedShipping({
+                        carrier: DELIVERY_METHODS.PICKUP,
+                        service: "Retirada",
+                        cost: 0,
+                        estimatedDays: 0,
+                      });
+                    }}
+                    className={`p-4 border rounded-[14px] text-left transition-all ${
+                      deliveryType === "pickup"
+                        ? "border-[#D97D93] bg-[#FCEEEF]"
+                        : "border-[#F2DCDD] bg-white hover:border-[#C98A96]"
+                    }`}
+                  >
+                    <p className="text-sm font-semibold text-[#7A4B52]">Retirar no Local</p>
+                    <p className="text-xs text-[#6E5A5D] mt-0.5">Retire pessoalmente de forma gratuita</p>
+                  </button>
                 </div>
+
+                {deliveryType === "delivery" ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {[
+                      { label: "CEP", field: "zipCode" as const, placeholder: "00000000", full: false },
+                      { label: "Rua", field: "street" as const, placeholder: "Nome da rua", full: true },
+                      { label: "Numero", field: "number" as const, placeholder: "123", full: false },
+                      { label: "Complemento", field: "complement" as const, placeholder: "Apto, Sala...", full: false },
+                      { label: "Bairro", field: "neighborhood" as const, placeholder: "Bairro", full: false },
+                      { label: "Cidade", field: "city" as const, placeholder: "Cidade", full: false },
+                      { label: "Estado", field: "state" as const, placeholder: "SP", full: false },
+                    ].map((field) => (
+                      <div key={field.label} className={field.full ? "sm:col-span-2" : ""}>
+                        <label className="block text-xs font-semibold text-[#7A4B52] mb-2">{field.label}</label>
+                        <input
+                          placeholder={field.placeholder}
+                          value={data[field.field]}
+                          onChange={(e) => updateField(field.field, e.target.value)}
+                          onBlur={field.field === "zipCode" ? (e) => handleCepBlur(e.target.value) : undefined}
+                          maxLength={field.field === "zipCode" ? 8 : field.field === "street" ? 255 : field.field === "number" ? 10 : field.field === "complement" ? 100 : field.field === "neighborhood" ? 100 : field.field === "city" ? 100 : 2}
+                          className="w-full h-12 px-4 border border-[#F2DCDD] rounded-xl text-sm text-[#7A4B52] placeholder-[#6E5A5D] outline-none focus:border-[#D97D93] transition-colors bg-white"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-3 p-5 bg-[#E8F5E9] rounded-[14px] text-sm text-[#2E7D32]">
+                    <Store size={20} className="flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold mb-1">Informacoes para Retirada</p>
+                      <p className="text-xs text-[#388E3C] leading-relaxed">
+                        Voce optou por retirar seu pedido diretamente no local. Nao e necessario preencher dados de endereco.
+                        Clique em continuar para prosseguir para o pagamento.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
 
@@ -532,7 +596,7 @@ export function CheckoutPageContent() {
             <div className="flex justify-between mt-8">
               {step > 1 ? (
                 <button
-                  onClick={() => setStep(step - 1)}
+                  onClick={() => setStep(step === 4 && deliveryType === "pickup" ? 2 : step - 1)}
                   className="h-12 px-6 border border-[#F2DCDD] text-sm text-[#6E5A5D] hover:border-[#D97D93] hover:text-[#D97D93] rounded-xl transition-colors flex items-center gap-2"
                 >
                   <ChevronLeft size={16} /> Voltar

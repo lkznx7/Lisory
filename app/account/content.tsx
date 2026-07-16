@@ -241,7 +241,7 @@ export function AccountPageContent() {
                                 {order.paymentMethod && (
                                   <div className="flex justify-between text-xs text-[#6E5A5D]">
                                     <span>Pagamento</span>
-                                    <span>{order.paymentMethod === "PIX" ? "PIX" : order.paymentMethod === "card" ? "Cartao de Credito" : order.paymentMethod}</span>
+                                    <span>{order.paymentMethod === "PIX" ? "PIX" : order.paymentMethod === "card" ? "Cartao de Credito" : order.paymentMethod === "PAGAR_NA_RETIRADA" ? "Pagar na Retirada" : order.paymentMethod}</span>
                                   </div>
                                 )}
                               </div>
