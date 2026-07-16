@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import type { AdminOrder, RecentOrder, DashboardStats, SalesDataPoint, AdminCustomerSummary, AdminOrderItem } from "@/types/admin";
+import type { AdminOrder, RecentOrder, DashboardStats, SalesDataPoint } from "@/types/admin";
 
 interface OrderResponse {
   id: string;
@@ -19,6 +19,8 @@ interface OrderResponse {
   guestEmail: string | null;
   guestPhone: string | null;
   guestCpf: string | null;
+  shippingCarrier: string | null;
+  shippingService: string | null;
   items: { id: string; productId: string; productName: string; productImage: string | null; quantity: number; unitPrice: number; subtotal: number }[];
   paymentId: string | null;
   paymentStatus: string | null;
@@ -101,6 +103,8 @@ function mapToAdminOrder(o: OrderResponse): AdminOrder {
       state,
       zipCode: "",
     },
+    shippingCarrier: o.shippingCarrier || null,
+    shippingService: o.shippingService || null,
     createdAt: o.createdAt,
     updatedAt: o.updatedAt,
   };

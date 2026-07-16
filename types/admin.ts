@@ -59,6 +59,8 @@ export interface AdminOrder {
   paymentMethod: string;
   paymentStatus: PaymentStatus;
   shippingAddress: Address;
+  shippingCarrier: string | null;
+  shippingService: string | null;
   createdAt: string;
   updatedAt: string;
 }

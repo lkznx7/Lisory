@@ -15,7 +15,7 @@ export const products: Product[] = [
   {
     id: "scoop-2",
     name: "Brilho em Dobro",
-    price: 230,
+    price: 229.90,
     image: "/images/scoop-2.jpg",
     badge: "Mais Popular",
     category: "Scoop",
@@ -28,7 +28,7 @@ export const products: Product[] = [
   {
     id: "scoop-3",
     name: "Coleção de Sonhos",
-    price: 290,
+    price: 289.90,
     image: "/images/scoop-3.jpg",
     badge: "Novo",
     category: "Scoop",
@@ -41,7 +41,7 @@ export const products: Product[] = [
   {
     id: "scoop-4",
     name: "Experiência Premium",
-    price: 350,
+    price: 349.90,
     image: "/images/scoop-4.jpg",
     badge: "Premium",
     category: "Scoop",

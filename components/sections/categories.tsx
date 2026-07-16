@@ -6,7 +6,6 @@ import { motion } from "motion/react";
 import { Gift, Diamond, Sparkles, Crown } from "lucide-react";
 import { api } from "@/lib/api";
 import { type ApiCategory } from "@/lib/mappers";
-import { products as fallbackProducts } from "@/constants/data";
 
 const iconMap: Record<string, typeof Gift> = {
   scoop: Gift,
@@ -17,9 +16,9 @@ const iconMap: Record<string, typeof Gift> = {
 const fallbackIcons = [Gift, Sparkles, Diamond, Crown, Crown];
 const fallbackOptions = [
   { name: "Primeira Surpresa", items: 4, price: "R$ 119,90", slug: "primeira-surpresa" },
-  { name: "Brilho em Dobro", items: 6, price: "R$ 230", slug: "brilho-em-dobro" },
-  { name: "Colecao de Sonhos", items: 9, price: "R$ 290", slug: "colecao-de-sonhos" },
-  { name: "Experiencia Premium", items: 12, price: "R$ 350", slug: "experiencia-premium" },
+  { name: "Brilho em Dobro", items: 6, price: "R$ 229,90", slug: "brilho-em-dobro" },
+  { name: "Colecao de Sonhos", items: 9, price: "R$ 289,90", slug: "colecao-de-sonhos" },
+  { name: "Experiencia Premium", items: 12, price: "R$ 349,90", slug: "experiencia-premium" },
   { name: "Pulseiras", items: 0, price: "Em breve", slug: "pulseiras" },
 ];
 

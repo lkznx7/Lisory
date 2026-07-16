@@ -143,6 +143,7 @@ export default function AdminPedidos() {
               <TableHead>Data</TableHead>
               <TableHead>Itens</TableHead>
               <TableHead>Total</TableHead>
+              <TableHead>Entrega</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Pagamento</TableHead>
               <TableHead className="w-16 text-right">Detalhes</TableHead>
@@ -167,6 +168,11 @@ export default function AdminPedidos() {
                   <TableCell>{order.items.length}</TableCell>
                   <TableCell className="font-medium">
                     R$ {order.total.toFixed(2)}
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-xs">
+                      {order.shippingCarrier || "—"}
+                    </span>
                   </TableCell>
                   <TableCell>
                     <Badge className={statusConfig[order.status]?.color} variant="secondary">
@@ -239,16 +245,41 @@ export default function AdminPedidos() {
 
               <div className="space-y-3">
                 <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                  Metodo de Entrega
+                </h4>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">
+                    {selectedOrder.shippingCarrier || "Nao informado"}
+                    {selectedOrder.shippingService && selectedOrder.shippingService !== selectedOrder.shippingCarrier && (
+                      <span className="text-muted-foreground"> — {selectedOrder.shippingService}</span>
+                    )}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Frete: R$ {selectedOrder.shipping.toFixed(2)}
+                  </p>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                   Endereço de Entrega
                 </h4>
-                <p className="text-sm">
-                  {selectedOrder.shippingAddress.street}, {selectedOrder.shippingAddress.number}
-                  {selectedOrder.shippingAddress.complement && ` - ${selectedOrder.shippingAddress.complement}`}
-                  <br />
-                  {selectedOrder.shippingAddress.neighborhood}, {selectedOrder.shippingAddress.city} - {selectedOrder.shippingAddress.state}
-                  <br />
-                  CEP: {selectedOrder.shippingAddress.zipCode}
-                </p>
+                {selectedOrder.shippingCarrier === "Retirada no Local" ? (
+                  <p className="text-sm text-muted-foreground italic">
+                    Retirada no estabelecimento (Sem endereço de entrega)
+                  </p>
+                ) : (
+                  <p className="text-sm">
+                    {selectedOrder.shippingAddress.street}, {selectedOrder.shippingAddress.number}
+                    {selectedOrder.shippingAddress.complement && ` - ${selectedOrder.shippingAddress.complement}`}
+                    <br />
+                    {selectedOrder.shippingAddress.neighborhood}, {selectedOrder.shippingAddress.city} - {selectedOrder.shippingAddress.state}
+                    <br />
+                    CEP: {selectedOrder.shippingAddress.zipCode}
+                  </p>
+                )}
               </div>
 
               <Separator />

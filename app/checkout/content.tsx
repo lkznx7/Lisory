@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
-import { ChevronLeft, ChevronRight, Check, Truck, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, Loader2, Store, MessageCircle, Info } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { shippingService } from "@/services/shipping.service";
 import { ShippingOption } from "@/types";
+import { SITE, WHATSAPP_MESSAGE, DELIVERY_METHODS } from "@/constants";
 
 const steps = ["Identificacao", "Endereco", "Entrega", "Pagamento"];
 
@@ -92,7 +93,7 @@ export function CheckoutPageContent() {
     setData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const calculateFreight = async (zipCode: string) => {
+  const calculateFreight = useCallback(async (zipCode: string) => {
     if (!zipCode || zipCode.length !== 8) return;
     setLoadingShipping(true);
     try {
@@ -115,13 +116,16 @@ export function CheckoutPageContent() {
     } finally {
       setLoadingShipping(false);
     }
-  };
+  }, [items]);
 
   useEffect(() => {
     if (data.zipCode && data.zipCode.length === 8) {
-      calculateFreight(data.zipCode);
+      const timeoutId = setTimeout(() => {
+        calculateFreight(data.zipCode);
+      }, 0);
+      return () => clearTimeout(timeoutId);
     }
-  }, [data.zipCode]);
+  }, [data.zipCode, calculateFreight]);
 
   const handleCepBlur = async (value: string) => {
     const cep = value.replace(/\D/g, "");
@@ -150,8 +154,11 @@ export function CheckoutPageContent() {
       return;
     }
     if (step === 3 && !selectedShipping) {
-      toast.error("Selecione uma opcao de frete para continuar");
+      toast.error("Selecione uma opcao de entrega para continuar");
       return;
+    }
+    if (step === 3 && selectedShipping?.carrier === DELIVERY_METHODS.UBER_FLASH) {
+      toast.info("Ao finalizar, combinaremos a entrega via WhatsApp.");
     }
     setStep(step + 1);
   };
@@ -170,18 +177,21 @@ export function CheckoutPageContent() {
 
     setLoading(true);
     try {
+      const isPickup = selectedShipping?.carrier === DELIVERY_METHODS.PICKUP;
+      const isUberFlash = selectedShipping?.carrier === DELIVERY_METHODS.UBER_FLASH;
+
       const orderPayload = {
         guestName: data.guestName,
         guestEmail: data.guestEmail,
         guestCpf: data.guestCpf.replace(/\D/g, ""),
         guestPhone: data.guestPhone,
-        street: data.street,
-        number: data.number,
-        complement: data.complement || null,
-        neighborhood: data.neighborhood,
-        city: data.city,
-        state: data.state,
-        zipCode: data.zipCode.replace(/\D/g, ""),
+        street: isPickup ? null : data.street,
+        number: isPickup ? null : data.number,
+        complement: isPickup ? null : (data.complement || null),
+        neighborhood: isPickup ? null : data.neighborhood,
+        city: isPickup ? null : data.city,
+        state: isPickup ? null : data.state,
+        zipCode: isPickup ? null : data.zipCode.replace(/\D/g, ""),
         paymentMethod: data.paymentMethod,
         shippingCarrier: selectedShipping?.carrier || null,
         shippingService: selectedShipping?.service || null,
@@ -189,6 +199,11 @@ export function CheckoutPageContent() {
       };
 
       const result = await api.post<{ id: string; paymentId?: string; paymentStatus?: string; invoiceUrl?: string }>("/orders/public", orderPayload);
+
+      if (isUberFlash) {
+        const encodedMsg = encodeURIComponent(WHATSAPP_MESSAGE);
+        window.open(`https://wa.me/${SITE.whatsapp}?text=${encodedMsg}`, "_blank");
+      }
 
       if (!result.invoiceUrl) {
         toast.error("Erro ao gerar link de pagamento. Tente novamente.");
@@ -205,6 +220,8 @@ export function CheckoutPageContent() {
     }
   };
 
+  const isPickup = selectedShipping?.carrier === DELIVERY_METHODS.PICKUP;
+  const isUberFlash = selectedShipping?.carrier === DELIVERY_METHODS.UBER_FLASH;
   const shippingCost = selectedShipping?.cost || 0;
   const total = totalPrice + shippingCost;
 
@@ -322,51 +339,158 @@ export function CheckoutPageContent() {
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Calculando frete...
                   </div>
-                ) : shippingOptions.length > 0 ? (
-                  <div className="space-y-3">
-                    {shippingOptions.map((option, index) => (
-                      <label
-                        key={index}
-                        className={`flex items-center justify-between p-4 border rounded-[14px] cursor-pointer transition-colors ${
-                          selectedShipping?.carrier === option.carrier && selectedShipping?.service === option.service
-                            ? "border-[#D97D93] bg-[#FCEEEF]"
-                            : "border-[#F2DCDD] hover:border-[#C98A96]"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="radio"
-                            name="shipping"
-                            checked={
-                              selectedShipping?.carrier === option.carrier &&
-                              selectedShipping?.service === option.service
-                            }
-                            onChange={() => setSelectedShipping(option)}
-                            className="text-[#D97D93]"
-                          />
-                          <div>
-                            <p className="text-sm font-semibold text-[#7A4B52]">
-                              {option.service && !option.service.startsWith(".") ? option.service : option.carrier}
-                            </p>
-                            <p className="text-xs text-[#6E5A5D] mt-0.5">
-                              Prazo estimado: {option.estimatedDays} dias uteis
-                            </p>
-                          </div>
-                        </div>
-                        <p className="text-sm font-semibold text-[#7A4B52]">
-                          {option.cost === 0 ? (
-                            <span className="text-[#3E8B5A]">Gratis</span>
-                          ) : (
-                            `R$ ${option.cost.toFixed(2).replace(".", ",")}`
-                          )}
-                        </p>
-                      </label>
-                    ))}
-                  </div>
                 ) : (
-                  <div className="text-center py-8 text-[#6E5A5D]">
-                    <Truck className="h-12 w-12 mx-auto mb-2 text-[#F2DCDD]" />
-                    <p>Informe o CEP no endereco para calcular o frete</p>
+                  <div className="space-y-3">
+                    {shippingOptions.length > 0 && (
+                      <>
+                        <p className="text-xs font-semibold text-[#6E5A5D] uppercase tracking-wider">
+                          Enviar por transportadora
+                        </p>
+                        {shippingOptions.map((option, index) => (
+                          <label
+                            key={`carrier-${index}`}
+                            className={`flex items-center justify-between p-4 border rounded-[14px] cursor-pointer transition-colors ${
+                              selectedShipping?.carrier === option.carrier && selectedShipping?.service === option.service
+                                ? "border-[#D97D93] bg-[#FCEEEF]"
+                                : "border-[#F2DCDD] hover:border-[#C98A96]"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <input
+                                type="radio"
+                                name="shipping"
+                                checked={
+                                  selectedShipping?.carrier === option.carrier &&
+                                  selectedShipping?.service === option.service
+                                }
+                                onChange={() => setSelectedShipping(option)}
+                                className="text-[#D97D93]"
+                              />
+                              <div>
+                                <p className="text-sm font-semibold text-[#7A4B52]">
+                                  {option.service && !option.service.startsWith(".") ? option.service : option.carrier}
+                                </p>
+                                <p className="text-xs text-[#6E5A5D] mt-0.5">
+                                  Prazo estimado: {option.estimatedDays} dias uteis
+                                </p>
+                              </div>
+                            </div>
+                            <p className="text-sm font-semibold text-[#7A4B52]">
+                              {option.cost === 0 ? (
+                                <span className="text-[#3E8B5A]">Gratis</span>
+                              ) : (
+                                `R$ ${option.cost.toFixed(2).replace(".", ",")}`
+                              )}
+                            </p>
+                          </label>
+                        ))}
+                        <div className="border-t border-[#F2DCDD] my-2" />
+                      </>
+                    )}
+
+                    <p className="text-xs font-semibold text-[#6E5A5D] uppercase tracking-wider">
+                      Outras opcoes
+                    </p>
+
+                    <label
+                      className={`flex items-center justify-between p-4 border rounded-[14px] cursor-pointer transition-colors ${
+                        selectedShipping?.carrier === DELIVERY_METHODS.PICKUP
+                          ? "border-[#D97D93] bg-[#FCEEEF]"
+                          : "border-[#F2DCDD] hover:border-[#C98A96]"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="shipping"
+                          checked={selectedShipping?.carrier === DELIVERY_METHODS.PICKUP}
+                          onChange={() => setSelectedShipping({
+                            carrier: DELIVERY_METHODS.PICKUP,
+                            service: "Retirada",
+                            cost: 0,
+                            estimatedDays: 0,
+                          })}
+                          className="text-[#D97D93]"
+                        />
+                        <div>
+                          <p className="text-sm font-semibold text-[#7A4B52] flex items-center gap-2">
+                            <Store size={16} />
+                            {DELIVERY_METHODS.PICKUP}
+                          </p>
+                          <p className="text-xs text-[#6E5A5D] mt-0.5">
+                            Retire seu pedido diretamente no estabelecimento
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-sm font-semibold text-[#3E8B5A]">Gratis</p>
+                    </label>
+
+                    {selectedShipping?.carrier === DELIVERY_METHODS.PICKUP && (
+                      <div className="flex items-start gap-2 p-3 bg-[#E8F5E9] rounded-[12px] text-xs text-[#2E7D32]">
+                        <Info size={14} className="mt-0.5 flex-shrink-0" />
+                        <span>
+                          Seu pedido sera preparado para retirada no estabelecimento. Voce recebera um e-mail quando estiver pronto.
+                        </span>
+                      </div>
+                    )}
+
+                    <label
+                      className={`flex items-center justify-between p-4 border rounded-[14px] cursor-pointer transition-colors ${
+                        selectedShipping?.carrier === DELIVERY_METHODS.UBER_FLASH
+                          ? "border-[#D97D93] bg-[#FCEEEF]"
+                          : "border-[#F2DCDD] hover:border-[#C98A96]"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="shipping"
+                          checked={selectedShipping?.carrier === DELIVERY_METHODS.UBER_FLASH}
+                          onChange={() => setSelectedShipping({
+                            carrier: DELIVERY_METHODS.UBER_FLASH,
+                            service: "Uber Flash",
+                            cost: 0,
+                            estimatedDays: 0,
+                          })}
+                          className="text-[#D97D93]"
+                        />
+                        <div>
+                          <p className="text-sm font-semibold text-[#7A4B52]">
+                            {DELIVERY_METHODS.UBER_FLASH}
+                          </p>
+                          <p className="text-xs text-[#6E5A5D] mt-0.5">
+                            Entrega rapida - valor combinado com a loja
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-sm font-semibold text-[#6E5A5D]">A combinar</p>
+                    </label>
+
+                    {selectedShipping?.carrier === DELIVERY_METHODS.UBER_FLASH && (
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-2 p-3 bg-[#FFF3E0] rounded-[12px] text-xs text-[#E65100]">
+                          <Info size={14} className="mt-0.5 flex-shrink-0" />
+                          <span>
+                            O valor da entrega via Uber Flash sera combinado diretamente com a loja pelo WhatsApp apos a confirmacao do pedido.
+                          </span>
+                        </div>
+                        <a
+                          href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 w-full h-12 bg-[#25D366] hover:bg-[#20BA5C] text-white text-sm font-semibold rounded-xl transition-colors"
+                        >
+                          <MessageCircle size={18} />
+                          Falar no WhatsApp
+                        </a>
+                      </div>
+                    )}
+
+                    {!loadingShipping && shippingOptions.length === 0 && selectedShipping === null && (
+                      <div className="text-center py-4 text-[#6E5A5D] text-xs">
+                        <p>Informe o CEP no endereco para ver opcoes de transportadora</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </motion.div>
@@ -426,7 +550,7 @@ export function CheckoutPageContent() {
                 disabled={loading}
                 className="h-12 px-8 bg-[#D97D93] hover:bg-[#C8667F] text-white text-sm font-semibold rounded-xl transition-colors flex items-center gap-2 disabled:opacity-50"
               >
-                {loading ? "Processando..." : step === 4 ? "Finalizar Pedido" : "Continuar"}{" "}
+                {loading ? "Processando..." : step === 4 ? (isUberFlash ? "Finalizar e Falar no WhatsApp" : "Finalizar Pedido") : "Continuar"}{" "}
                 {!loading && <ChevronRight size={16} />}
               </button>
             </div>
@@ -462,9 +586,13 @@ export function CheckoutPageContent() {
                   <span className="text-[#6E5A5D]">Frete</span>
                   <span className={shippingCost === 0 && selectedShipping ? "text-[#3E8B5A] font-medium" : "text-[#7A4B52] font-medium"}>
                     {selectedShipping
-                      ? shippingCost === 0
-                        ? "Gratis"
-                        : `R$ ${shippingCost.toFixed(2)}`
+                      ? isPickup
+                        ? "Gratis (Retirada)"
+                        : isUberFlash
+                          ? "A combinar"
+                          : shippingCost === 0
+                            ? "Gratis"
+                            : `R$ ${shippingCost.toFixed(2)}`
                       : "A calcular"}
                   </span>
                 </div>

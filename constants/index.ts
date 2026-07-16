@@ -5,8 +5,16 @@ export const SITE = {
   url: "https://lisory.com.br",
   email: "Lisoryacessorios@gmail.com",
   phone: "",
+  whatsapp: "5561983504415",
   tiktok: "@lisory.acessorios",
 };
+
+export const WHATSAPP_MESSAGE = "Olá! Acabei de realizar um pedido no site e gostaria de combinar a entrega via Uber Flash.";
+
+export const DELIVERY_METHODS = {
+  PICKUP: "Retirada no Local",
+  UBER_FLASH: "Uber Flash",
+} as const;
 
 export const FREE_SHIPPING_THRESHOLD = 149;
 
