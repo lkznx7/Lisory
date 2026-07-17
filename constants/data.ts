@@ -56,7 +56,7 @@ export const products: Product[] = [
     name: "Colar Sweet Cherry",
     price: 69.9,
     image: "/images/ColarSweetcherry.png",
-    category: "Pulseiras",
+    category: "Colares",
     rating: 5.0,
     reviews: 0,
     description: "Colar Sweet Cherry - A elegância em forma de pingente.\n\nUma peça delicada e cheia de personalidade para complementar seu visual.",
