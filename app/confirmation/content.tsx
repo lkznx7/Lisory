@@ -45,10 +45,16 @@ export function ConfirmationPageContent() {
   }, [orderId]);
 
   const orderIdShort = order ? order.id.slice(0, 8).toUpperCase() : "";
-  const whatsappMsg = `Olá! Acabei de realizar um pedido com a opção Retirada no Local e gostaria de combinar o dia e o horário para retirada. Meu pedido é o nº ${orderIdShort}.`;
+
+  let whatsappMsg = "";
+  if (order?.shippingCarrier === "Retirada no Local") {
+    whatsappMsg = `Olá! Meu pagamento foi aprovado e escolhi a opção Retirada no Local. Gostaria de combinar o dia e o horário para retirada. Meu pedido é o nº ${orderIdShort}.`;
+  } else if (order?.shippingCarrier === "Uber Flash") {
+    whatsappMsg = `Olá! Meu pagamento foi aprovado e escolhi a opção Uber Flash. Gostaria de combinar o envio do meu pedido. Meu pedido é o nº ${orderIdShort}.`;
+  }
 
   useEffect(() => {
-    if (order && order.status === "PAGO" && order.shippingCarrier === "Retirada no Local") {
+    if (order && order.status === "PAGO" && (order.shippingCarrier === "Retirada no Local" || order.shippingCarrier === "Uber Flash")) {
       window.location.href = `https://wa.me/5561983504415?text=${encodeURIComponent(whatsappMsg)}`;
     }
   }, [order, whatsappMsg]);
@@ -88,18 +94,22 @@ export function ConfirmationPageContent() {
             <p className="text-xs tracking-[0.4em] uppercase mb-4" style={{ color: statusInfo.color }}>
               {statusInfo.label}
             </p>
-            {order.shippingCarrier === "Retirada no Local" ? (
+            {(order.shippingCarrier === "Retirada no Local" || order.shippingCarrier === "Uber Flash") ? (
               <>
                 <h1 className="font-['Cormorant_Garamond'] text-4xl font-light text-[#7A4B52] mb-4">
-                  Seu pedido foi recebido!
+                  {order.shippingCarrier === "Retirada no Local" ? "Seu pedido foi recebido!" : "Seu envio está sendo preparado!"}
                 </h1>
                 <div className="text-[#6E5A5D] text-sm leading-relaxed mb-8 space-y-4">
                   <p>
-                    Para combinar o dia e horário da retirada, entre em contato pelo WhatsApp:
+                    {order.shippingCarrier === "Retirada no Local"
+                      ? "Para combinar o dia e horário da retirada, entre em contato pelo WhatsApp:"
+                      : "Para combinar o envio do seu pedido via Uber Flash, entre em contato pelo WhatsApp:"}
                   </p>
                   <p className="font-bold text-lg text-[#7A4B52]">(61) 98350-4415</p>
                   <p>
-                    Nossa equipe combinará o melhor horário para retirada do pedido.
+                    {order.shippingCarrier === "Retirada no Local"
+                      ? "Nossa equipe combinará o melhor horário para retirada do pedido."
+                      : "Nossa equipe combinará os detalhes de envio do seu pedido."}
                   </p>
                   <div className="flex justify-center pt-2">
                     <a

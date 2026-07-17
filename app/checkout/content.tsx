@@ -212,11 +212,6 @@ export function CheckoutPageContent() {
 
       const result = await api.post<{ id: string; paymentId?: string; paymentStatus?: string; invoiceUrl?: string }>("/orders/public", orderPayload);
 
-      if (isUberFlash) {
-        const encodedMsg = encodeURIComponent(WHATSAPP_MESSAGE);
-        window.open(`https://wa.me/${SITE.whatsapp}?text=${encodedMsg}`, "_blank");
-      }
-
 
 
       if (!result.invoiceUrl) {
@@ -538,15 +533,6 @@ export function CheckoutPageContent() {
                             O valor da entrega via Uber Flash sera combinado diretamente com a loja pelo WhatsApp apos a confirmacao do pedido.
                           </span>
                         </div>
-                        <a
-                          href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center justify-center gap-2 w-full h-12 bg-[#25D366] hover:bg-[#20BA5C] text-white text-sm font-semibold rounded-xl transition-colors"
-                        >
-                          <MessageCircle size={18} />
-                          Falar no WhatsApp
-                        </a>
                       </div>
                     )}
 
