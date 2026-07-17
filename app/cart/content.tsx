@@ -78,10 +78,19 @@ export function CartPageContent() {
         discount = Math.min(result.discountValue, totalPrice);
       }
       setAppliedCoupon({ code: result.code, discount });
+      localStorage.setItem(
+        "lisory_applied_coupon",
+        JSON.stringify({
+          code: result.code,
+          discountType: result.discountType,
+          discountValue: result.discountValue,
+        })
+      );
       toast.success("Cupom aplicado com sucesso!");
     } catch {
       toast.error("Cupom invalido ou expirado");
       setAppliedCoupon(null);
+      localStorage.removeItem("lisory_applied_coupon");
     } finally {
       setLoadingCoupon(false);
     }
@@ -90,7 +99,27 @@ export function CartPageContent() {
   const removeCoupon = () => {
     setAppliedCoupon(null);
     setCouponCode("");
+    localStorage.removeItem("lisory_applied_coupon");
   };
+
+  useEffect(() => {
+    const saved = localStorage.getItem("lisory_applied_coupon");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        let discount = 0;
+        if (parsed.discountType === "PERCENTAGE") {
+          discount = (totalPrice * parsed.discountValue) / 100;
+        } else {
+          discount = Math.min(parsed.discountValue, totalPrice);
+        }
+        setAppliedCoupon({ code: parsed.code, discount });
+        setCouponCode(parsed.code);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, [totalPrice]);
 
   const shipping = shippingCost !== null ? shippingCost : (totalPrice >= FREE_SHIPPING_THRESHOLD ? 0 : 19.9);
   const discount = appliedCoupon?.discount || 0;

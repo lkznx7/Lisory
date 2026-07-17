@@ -30,10 +30,12 @@ function getToken(): string | null {
 
 export function setToken(token: string) {
   localStorage.setItem("lisory_token", token);
+  setCookie("lisory_token", token, 7); // Store token in cookie for 7 days
 }
 
 export function removeToken() {
   localStorage.removeItem("lisory_token");
+  setCookie("lisory_token", "", -1); // Remove token cookie
 }
 
 export function getGuestCartId(): string {

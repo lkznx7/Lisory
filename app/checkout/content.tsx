@@ -76,6 +76,7 @@ export function CheckoutPageContent() {
   const [selectedShipping, setSelectedShipping] = useState<ShippingOption | null>(null);
   const [loadingShipping, setLoadingShipping] = useState(false);
   const [deliveryType, setDeliveryType] = useState<"delivery" | "pickup">("delivery");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discountType: string; discountValue: number } | null>(null);
   const [data, setData] = useState<CheckoutData>({
     guestName: "",
     guestEmail: "",
@@ -128,6 +129,17 @@ export function CheckoutPageContent() {
       return () => clearTimeout(timeoutId);
     }
   }, [data.zipCode, calculateFreight, deliveryType]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("lisory_applied_coupon");
+    if (saved) {
+      try {
+        setAppliedCoupon(JSON.parse(saved));
+      } catch (e) {
+        console.error("Error reading coupon from localStorage", e);
+      }
+    }
+  }, []);
 
   const handleCepBlur = async (value: string) => {
     const cep = value.replace(/\D/g, "");
@@ -208,6 +220,7 @@ export function CheckoutPageContent() {
         shippingCarrier: selectedShipping?.carrier || null,
         shippingService: selectedShipping?.service || null,
         shippingCost: selectedShipping?.cost || 0,
+        couponCode: appliedCoupon?.code || null,
       };
 
       const result = await api.post<{ id: string; paymentId?: string; paymentStatus?: string; invoiceUrl?: string }>("/orders/public", orderPayload);
@@ -220,6 +233,7 @@ export function CheckoutPageContent() {
         return;
       }
 
+      localStorage.removeItem("lisory_applied_coupon");
       await clearCart();
       window.location.href = result.invoiceUrl;
     } catch (err) {
@@ -232,7 +246,16 @@ export function CheckoutPageContent() {
   const isPickup = selectedShipping?.carrier === DELIVERY_METHODS.PICKUP;
   const isUberFlash = selectedShipping?.carrier === DELIVERY_METHODS.UBER_FLASH;
   const shippingCost = selectedShipping?.cost || 0;
-  const total = totalPrice + shippingCost;
+  
+  let discount = 0;
+  if (appliedCoupon) {
+    if (appliedCoupon.discountType === "PERCENTAGE") {
+      discount = (totalPrice * appliedCoupon.discountValue) / 100;
+    } else {
+      discount = Math.min(appliedCoupon.discountValue, totalPrice);
+    }
+  }
+  const total = Math.max(0, totalPrice - discount + shippingCost);
 
   return (
     <main className="pt-[72px] sm:pt-[88px] lg:pt-[96px] min-h-screen bg-[#FFF9F8]">
@@ -646,6 +669,12 @@ export function CheckoutPageContent() {
                       : "A calcular"}
                   </span>
                 </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[#3E8B5A]">Desconto ({appliedCoupon?.code})</span>
+                    <span className="text-[#3E8B5A] font-medium">-R${discount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between font-semibold pt-2 border-t border-[#F2DCDD]">
                   <span>Total</span>
                   <span className="text-[#D97D93]">R${total.toFixed(2)}</span>

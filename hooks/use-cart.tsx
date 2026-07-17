@@ -163,6 +163,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = useCallback(async () => {
     setItems([]);
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("lisory_applied_coupon");
+    }
     try {
       await api.delete("/cart");
     } catch {
