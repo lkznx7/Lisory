@@ -87,26 +87,44 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductPage({ params }: Props) {
   const { id } = await params;
-  const apiProduct = await getProduct(id);
+  let apiProduct = await getProduct(id);
+
+  // Safely check if the product has a valid price, name and structure. 
+  // If the API returned an error payload or empty object, fall back to constants.
+  const hasValidPrice = 
+    apiProduct && 
+    typeof apiProduct === "object" && 
+    "price" in apiProduct && 
+    (apiProduct as any).price !== null &&
+    (apiProduct as any).price !== undefined;
+
+  if (!hasValidPrice) {
+    apiProduct = getProductById(id) || null;
+  }
+
   if (!apiProduct) notFound();
 
-  const isApiProduct = "images" in apiProduct && Array.isArray(apiProduct.images);
+  const isApiProduct = 
+    apiProduct &&
+    typeof apiProduct === "object" &&
+    "images" in apiProduct && 
+    Array.isArray((apiProduct as any).images);
 
   const product: Product = isApiProduct
     ? {
-        id: apiProduct.slug || apiProduct.id,
-        name: apiProduct.name,
-        price: formatProductPrice(apiProduct.promotionalPrice || apiProduct.price),
-        originalPrice: apiProduct.promotionalPrice ? formatProductPrice(apiProduct.price) : undefined,
-        image: apiProduct.images?.find((img) => img.isPrimary)?.imageUrl || apiProduct.images?.[0]?.imageUrl || "/images/scoop-1.jpg",
-        category: apiProduct.categoryName || "Scoop",
-        rating: apiProduct.rating || 4.9,
-        reviews: apiProduct.reviews || 187,
-        description: apiProduct.description,
+        id: (apiProduct as any).slug || (apiProduct as any).id,
+        name: (apiProduct as any).name,
+        price: formatProductPrice(Number((apiProduct as any).promotionalPrice || (apiProduct as any).price)),
+        originalPrice: (apiProduct as any).promotionalPrice ? formatProductPrice(Number((apiProduct as any).price)) : undefined,
+        image: (apiProduct as any).images?.find((img: any) => img.isPrimary)?.imageUrl || (apiProduct as any).images?.[0]?.imageUrl || "/images/scoop-1.jpg",
+        category: (apiProduct as any).categoryName || "Scoop",
+        rating: (apiProduct as any).rating || 4.9,
+        reviews: (apiProduct as any).reviews || 187,
+        description: (apiProduct as any).description,
       }
     : (apiProduct as Product);
 
-  const relatedApi = await getRelatedProducts(isApiProduct ? apiProduct.id : product.id);
+  const relatedApi = await getRelatedProducts(isApiProduct ? (apiProduct as any).id : product.id);
 
   const relatedProducts = relatedApi.length > 0
     ? relatedApi

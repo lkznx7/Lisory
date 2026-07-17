@@ -17,14 +17,17 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const { addItem } = useCart();
   const router = useRouter();
 
+  const price = typeof product.price === "number" ? product.price : Number(product.price) || 0;
+  const originalPrice = product.originalPrice ? (typeof product.originalPrice === "number" ? product.originalPrice : Number(product.originalPrice) || 0) : undefined;
+
   const handleAddToCart = () => {
-    addItem(product.id, product.name, product.price, product.image, qty);
+    addItem(product.id, product.name, price, product.image, qty);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
 
   const handleBuyNow = () => {
-    addItem(product.id, product.name, product.price, product.image);
+    addItem(product.id, product.name, price, product.image);
     router.push("/checkout");
   };
 
@@ -43,16 +46,16 @@ export function ProductInfo({ product }: ProductInfoProps) {
       <div className="bg-white border border-[#F2DCDD] rounded-[18px] p-5">
         <div className="flex items-baseline gap-3 mb-1">
           <span className="text-3xl font-semibold text-[#D97D93]">
-            R${product.price.toFixed(2)}
+            R${price.toFixed(2)}
           </span>
-          {product.originalPrice && (
+          {originalPrice && (
             <span className="text-lg text-[#6E5A5D] line-through">
-              R${product.originalPrice.toFixed(2)}
+              R${originalPrice.toFixed(2)}
             </span>
           )}
         </div>
         <p className="text-sm text-[#6E5A5D]">
-          em até 12× de R${(product.price / 12).toFixed(2)} sem juros
+          em até 12× de R${(price / 12).toFixed(2)} sem juros
         </p>
         <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#F2DCDD]">
           <Sparkles size={14} className="text-[#C8667F]" />
