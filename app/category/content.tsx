@@ -10,8 +10,6 @@ import { mapApiProductToProduct, type ApiProduct, type ApiCategory } from "@/lib
 import { SORT_OPTIONS, PRICE_RANGES } from "@/constants";
 import { products as fallbackProducts } from "@/constants/data";
 
-const PULSEIRAS_CATEGORY = { id: "pulseiras-static", name: "Pulseiras", slug: "pulseiras", description: "", active: true, createdAt: "" };
-const COLARES_CATEGORY = { id: "colares-static", name: "Colares", slug: "colares", description: "", active: true, createdAt: "" };
 import { ProductCard } from "@/components/product/product-card";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import type { Product } from "@/types";
@@ -35,25 +33,11 @@ export function CategoryPageContent() {
       .get<ApiCategory[]>("/categories")
       .then((cats) => {
         if (cats && cats.length > 0) {
-          let updatedCats = [...cats];
-          if (!updatedCats.some((c) => c.slug === "pulseiras")) {
-            updatedCats.push(PULSEIRAS_CATEGORY);
-          }
-          if (!updatedCats.some((c) => c.slug === "colares")) {
-            const pulseirasIdx = updatedCats.findIndex((c) => c.slug === "pulseiras");
-            if (pulseirasIdx !== -1) {
-              updatedCats.splice(pulseirasIdx + 1, 0, COLARES_CATEGORY);
-            } else {
-              updatedCats.push(COLARES_CATEGORY);
-            }
-          }
-          setCategories(updatedCats);
-        } else {
-          setCategories([PULSEIRAS_CATEGORY, COLARES_CATEGORY]);
+          setCategories(cats);
         }
       })
       .catch(() => {
-        setCategories([PULSEIRAS_CATEGORY, COLARES_CATEGORY]);
+        // Handle error silently
       });
   }, []);
 

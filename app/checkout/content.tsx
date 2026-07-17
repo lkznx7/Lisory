@@ -488,7 +488,7 @@ export function CheckoutPageContent() {
                       <div className="flex items-start gap-2 p-3 bg-[#E8F5E9] rounded-[12px] text-xs text-[#2E7D32]">
                         <Info size={14} className="mt-0.5 flex-shrink-0" />
                         <span>
-                          Seu pedido sera preparado para retirada no estabelecimento. Voce recebera um e-mail quando estiver pronto.
+                          Seu pedido sera preparado para retirada no estabelecimento. Os detalhes da retirada serao combinados pelo WhatsApp da loja.
                         </span>
                       </div>
                     )}
