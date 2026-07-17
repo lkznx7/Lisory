@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Search,
@@ -38,8 +38,16 @@ export function Navbar() {
   const [megaMenu, setMegaMenu] = useState<string | null>(null);
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const categorySlug = searchParams.get("category");
+  const [categorySlug, setCategorySlug] = useState<string | null>(null);
+
+  const searchStr = typeof window !== "undefined" ? window.location.search : "";
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      setCategorySlug(params.get("category"));
+    }
+  }, [pathname, searchStr]);
   const { totalCount: cartCount } = useCart();
   const { items: wishlist } = useWishlist();
   const { user, isAdmin, logout, isLoading } = useAuth();
