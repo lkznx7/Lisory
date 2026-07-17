@@ -13,13 +13,14 @@ const iconMap: Record<string, typeof Gift> = {
   prata: Sparkles,
 };
 
-const fallbackIcons = [Gift, Sparkles, Diamond, Crown, Crown];
+const fallbackIcons = [Gift, Sparkles, Diamond, Crown, Crown, Sparkles];
 const fallbackOptions = [
   { name: "Primeira Surpresa", items: 4, price: "R$ 119,90", slug: "primeira-surpresa" },
   { name: "Brilho em Dobro", items: 6, price: "R$ 229,90", slug: "brilho-em-dobro" },
   { name: "Colecao de Sonhos", items: 9, price: "R$ 289,90", slug: "colecao-de-sonhos" },
   { name: "Experiencia Premium", items: 12, price: "R$ 349,90", slug: "experiencia-premium" },
   { name: "Pulseiras", items: 0, price: "Em breve", slug: "pulseiras" },
+  { name: "Colares", items: 0, price: "Em breve", slug: "colares" },
 ];
 
 export function CategoriesSection() {
@@ -73,18 +74,18 @@ export function CategoriesSection() {
         <h2 className="font-['Cormorant_Garamond'] text-3xl sm:text-4xl lg:text-5xl font-light text-[#7A4B52]">Nossos Scoops</h2>
         <p className="text-[#6E5A5D] text-sm mt-4 max-w-md mx-auto">Quanto maior o scoop, mais acessorios, mais surpresas e mais emocao.</p>
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
         {fallbackOptions.map((scoop, i) => {
           const Icon = fallbackIcons[i];
           return (
             <motion.div key={scoop.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.5 }}>
-              <Link href={scoop.slug === "pulseiras" ? `/category?category=pulseiras` : `/product/${scoop.slug}`} className="group relative flex flex-col items-center text-center p-6 sm:p-8 rounded-[18px] bg-gradient-to-b from-[#F8E6E8] to-[#FFF9F8] border border-[#F2DCDD] hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <Link href={scoop.slug === "pulseiras" || scoop.slug === "colares" ? `/category?category=${scoop.slug}` : `/product/${scoop.slug}`} className="group relative flex flex-col items-center text-center p-6 sm:p-8 rounded-[18px] bg-gradient-to-b from-[#F8E6E8] to-[#FFF9F8] border border-[#F2DCDD] hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                 <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#D97D93] to-[#C98A96] rounded-2xl flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform duration-300">
                   <Icon size={26} className="text-white" />
                 </div>
                 <h3 className="font-['Cormorant_Garamond'] text-lg sm:text-xl font-semibold text-[#7A4B52] mb-2">{scoop.name}</h3>
                 <p className="text-xs sm:text-sm text-[#6E5A5D] mb-3">{scoop.items} acessorios</p>
-                {scoop.slug === "pulseiras" ? (
+                {scoop.slug === "pulseiras" || scoop.slug === "colares" ? (
                   <span className="text-xs sm:text-sm text-[#6E5A5D] mt-2">Em breve</span>
                 ) : (
                   <div className="flex items-center gap-2">

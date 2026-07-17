@@ -146,7 +146,7 @@ export function CartPageContent() {
                       <div className="flex items-center border border-[#F2DCDD] rounded-[10px] overflow-hidden">
                         <button
                           onClick={() =>
-                            updateQuantity(item.id, Math.max(1, item.qty - 1))
+                            updateQuantity(item.id, item.qty - 1)
                           }
                           className="w-9 h-9 flex items-center justify-center hover:bg-[#FCEEEF] transition-colors"
                         >

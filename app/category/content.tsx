@@ -11,6 +11,7 @@ import { SORT_OPTIONS, PRICE_RANGES } from "@/constants";
 import { products as fallbackProducts } from "@/constants/data";
 
 const PULSEIRAS_CATEGORY = { id: "pulseiras-static", name: "Pulseiras", slug: "pulseiras", description: "", active: true, createdAt: "" };
+const COLARES_CATEGORY = { id: "colares-static", name: "Colares", slug: "colares", description: "", active: true, createdAt: "" };
 import { ProductCard } from "@/components/product/product-card";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import type { Product } from "@/types";
@@ -34,14 +35,25 @@ export function CategoryPageContent() {
       .get<ApiCategory[]>("/categories")
       .then((cats) => {
         if (cats && cats.length > 0) {
-          const hasPulseiras = cats.some((c) => c.slug === "pulseiras");
-          setCategories(hasPulseiras ? cats : [...cats, PULSEIRAS_CATEGORY]);
+          let updatedCats = [...cats];
+          if (!updatedCats.some((c) => c.slug === "pulseiras")) {
+            updatedCats.push(PULSEIRAS_CATEGORY);
+          }
+          if (!updatedCats.some((c) => c.slug === "colares")) {
+            const pulseirasIdx = updatedCats.findIndex((c) => c.slug === "pulseiras");
+            if (pulseirasIdx !== -1) {
+              updatedCats.splice(pulseirasIdx + 1, 0, COLARES_CATEGORY);
+            } else {
+              updatedCats.push(COLARES_CATEGORY);
+            }
+          }
+          setCategories(updatedCats);
         } else {
-          setCategories([PULSEIRAS_CATEGORY]);
+          setCategories([PULSEIRAS_CATEGORY, COLARES_CATEGORY]);
         }
       })
       .catch(() => {
-        setCategories([PULSEIRAS_CATEGORY]);
+        setCategories([PULSEIRAS_CATEGORY, COLARES_CATEGORY]);
       });
   }, []);
 
@@ -301,6 +313,15 @@ export function CategoryPageContent() {
                   </p>
                   <p className="text-[#6E5A5D] text-sm max-w-md mx-auto">
                     Estamos preparando uma coleção especial de pulseiras para você. Em breve novidades! ✨
+                  </p>
+                </div>
+              ) : selectedCategory === "colares" ? (
+                <div className="text-center py-20">
+                  <p className="font-['Cormorant_Garamond'] text-2xl sm:text-3xl font-semibold text-[#7A4B52] mb-3">
+                    Colares em breve!
+                  </p>
+                  <p className="text-[#6E5A5D] text-sm max-w-md mx-auto">
+                    Estamos preparando uma coleção especial de colares para você. Em breve novidades! ✨
                   </p>
                 </div>
               ) : (

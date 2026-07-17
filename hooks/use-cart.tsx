@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import { formatProductPrice } from "@/lib/utils";
 
 interface ApiCartItem {
   id: string;
@@ -58,7 +59,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         data.items.map((item) => ({
           id: item.productId,
           name: item.productName,
-          price: Number(item.unitPrice),
+          price: formatProductPrice(Number(item.unitPrice)),
           qty: item.quantity,
           image: item.productImage || "/images/scoop-1.jpg",
           backendCartItemId: item.id,

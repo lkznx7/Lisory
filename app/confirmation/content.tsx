@@ -44,13 +44,14 @@ export function ConfirmationPageContent() {
       .finally(() => setLoading(false));
   }, [orderId]);
 
+  const orderIdShort = order ? order.id.slice(0, 8).toUpperCase() : "";
+  const whatsappMsg = `Olá! Acabei de realizar um pedido com a opção Retirada no Local e gostaria de combinar o dia e o horário para retirada. Meu pedido é o nº ${orderIdShort}.`;
+
   useEffect(() => {
     if (order && order.status === "PAGO" && order.shippingCarrier === "Retirada no Local") {
-      const orderIdShort = order.id.slice(0, 8).toUpperCase();
-      const msg = `Olá! Acabei de realizar um pedido com a opção Retirada no Local e gostaria de combinar o dia e o horário para retirada. Meu número do pedido é: #${orderIdShort}.`;
-      window.location.href = `https://wa.me/5561983504415?text=${encodeURIComponent(msg)}`;
+      window.location.href = `https://wa.me/5561983504415?text=${encodeURIComponent(whatsappMsg)}`;
     }
-  }, [order]);
+  }, [order, whatsappMsg]);
 
   const statusInfo = order ? STATUS_LABELS[order.status] || STATUS_LABELS.PENDING_PAYMENT : null;
   const isPaid = order?.status === "PAGO";
@@ -102,7 +103,7 @@ export function ConfirmationPageContent() {
                   </p>
                   <div className="flex justify-center pt-2">
                     <a
-                      href={`https://wa.me/5561983504415?text=${encodeURIComponent("Olá! Acabei de realizar um pedido no site e gostaria de combinar a retirada do mesmo.")}`}
+                      href={`https://wa.me/5561983504415?text=${encodeURIComponent(whatsappMsg)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center gap-2 px-6 h-12 bg-[#25D366] hover:bg-[#20BA5C] text-white text-sm font-semibold rounded-xl transition-colors"

@@ -1,4 +1,5 @@
 import type { Product } from "@/types";
+import { formatProductPrice } from "@/lib/utils";
 
 export interface ApiProduct {
   id: string;
@@ -36,8 +37,8 @@ export function mapApiProductToProduct(api: ApiProduct): Product {
   return {
     id: api.slug,
     name: api.name,
-    price: hasDiscount ? api.promotionalPrice! : api.price,
-    originalPrice: hasDiscount ? api.price : undefined,
+    price: formatProductPrice(hasDiscount ? api.promotionalPrice! : api.price),
+    originalPrice: hasDiscount ? formatProductPrice(api.price) : undefined,
     image: primaryImage?.imageUrl || "/images/placeholder.jpg",
     category: api.categoryName || "Scoop",
     rating: 4.9,

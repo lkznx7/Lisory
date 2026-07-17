@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Search,
@@ -38,6 +38,8 @@ export function Navbar() {
   const [megaMenu, setMegaMenu] = useState<string | null>(null);
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const categorySlug = searchParams.get("category");
   const { totalCount: cartCount } = useCart();
   const { items: wishlist } = useWishlist();
   const { user, isAdmin, logout, isLoading } = useAuth();
@@ -195,7 +197,7 @@ export function Navbar() {
                 href="/category?category=pulseiras"
                 className={cn(
                   "px-4 py-2 text-[13px] font-medium tracking-wide rounded-lg transition-all duration-200",
-                  pathname === "/category" && megaMenu !== "scoops"
+                  pathname === "/category" && categorySlug === "pulseiras"
                     ? "text-[#D97D93] bg-[#FCEEEF]"
                     : "text-[#7A4B52] hover:text-[#D97D93] hover:bg-[#FCEEEF]/50"
                 )}
@@ -203,10 +205,21 @@ export function Navbar() {
                 Pulseiras
               </Link>
               <Link
+                href="/category?category=colares"
+                className={cn(
+                  "px-4 py-2 text-[13px] font-medium tracking-wide rounded-lg transition-all duration-200",
+                  pathname === "/category" && categorySlug === "colares"
+                    ? "text-[#D97D93] bg-[#FCEEEF]"
+                    : "text-[#7A4B52] hover:text-[#D97D93] hover:bg-[#FCEEEF]/50"
+                )}
+              >
+                Colares
+              </Link>
+              <Link
                 href="/category"
                 className={cn(
                   "px-4 py-2 text-[13px] font-medium tracking-wide rounded-lg transition-all duration-200",
-                  pathname === "/category"
+                  pathname === "/category" && !categorySlug
                     ? "text-[#D97D93] bg-[#FCEEEF]"
                     : "text-[#7A4B52] hover:text-[#D97D93] hover:bg-[#FCEEEF]/50"
                 )}
@@ -378,6 +391,13 @@ export function Navbar() {
               className="w-full flex items-center py-3.5 px-4 text-[14px] font-medium text-[#7A4B52] hover:bg-[#FCEEEF] rounded-xl transition-colors"
             >
               Pulseiras
+            </Link>
+            <Link
+              href="/category?category=colares"
+              onClick={() => setMobileOpen(false)}
+              className="w-full flex items-center py-3.5 px-4 text-[14px] font-medium text-[#7A4B52] hover:bg-[#FCEEEF] rounded-xl transition-colors"
+            >
+              Colares
             </Link>
             <Link
               href="/category"

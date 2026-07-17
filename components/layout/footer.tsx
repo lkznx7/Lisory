@@ -49,6 +49,7 @@ export function Footer() {
                 { name: "Colecao de Sonhos", href: "/product/colecao-de-sonhos" },
                 { name: "Experiencia Premium", href: "/product/experiencia-premium" },
                 { name: "Pulseiras", href: "/category?category=pulseiras" },
+                { name: "Colares", href: "/category?category=colares" },
                 { name: "Todos os Produtos", href: "/category" },
               ],
             },

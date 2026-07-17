@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ProductDetailContent } from "./content";
 import { products as fallbackProducts, getProductById } from "@/constants/data";
 import type { Product } from "@/types";
+import { formatProductPrice } from "@/lib/utils";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.lisory.com.br";
 
@@ -53,8 +54,8 @@ async function getRelatedProducts(productId: string): Promise<Product[]> {
     return data.map((p) => ({
       id: p.slug || p.id,
       name: p.name,
-      price: p.promotionalPrice || p.price,
-      originalPrice: p.promotionalPrice ? p.price : undefined,
+      price: formatProductPrice(p.promotionalPrice || p.price),
+      originalPrice: p.promotionalPrice ? formatProductPrice(p.price) : undefined,
       image: p.images?.find((img) => img.isPrimary)?.imageUrl || p.images?.[0]?.imageUrl || "/images/scoop-1.jpg",
       category: p.categoryName || "Scoop",
       rating: p.rating || 4.9,
@@ -95,8 +96,8 @@ export default async function ProductPage({ params }: Props) {
     ? {
         id: apiProduct.slug || apiProduct.id,
         name: apiProduct.name,
-        price: apiProduct.promotionalPrice || apiProduct.price,
-        originalPrice: apiProduct.promotionalPrice ? apiProduct.price : undefined,
+        price: formatProductPrice(apiProduct.promotionalPrice || apiProduct.price),
+        originalPrice: apiProduct.promotionalPrice ? formatProductPrice(apiProduct.price) : undefined,
         image: apiProduct.images?.find((img) => img.isPrimary)?.imageUrl || apiProduct.images?.[0]?.imageUrl || "/images/scoop-1.jpg",
         category: apiProduct.categoryName || "Scoop",
         rating: apiProduct.rating || 4.9,
